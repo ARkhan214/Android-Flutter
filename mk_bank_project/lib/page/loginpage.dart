@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mk_bank_project/page/adminpage.dart';
+import 'package:mk_bank_project/page/employeepage.dart';
 import 'package:mk_bank_project/page/registrationpage.dart';
+import 'package:mk_bank_project/page/userpage.dart';
+import 'package:mk_bank_project/service/authservice.dart';
 
 class LoginPage extends StatelessWidget {
 
@@ -12,6 +17,9 @@ class LoginPage extends StatelessWidget {
 
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
+
+  final storage = new FlutterSecureStorage();
+  AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +60,12 @@ class LoginPage extends StatelessWidget {
 
             ElevatedButton(
                 onPressed: (){
-                    String em = email.text;
-                    String pass = password.text;
-                    print('Email: $em,Password: $pass');
+                  
+                  loginUser(context);
+                  
+                    // String em = email.text;
+                    // String pass = password.text;
+                    // print('Email: $em,Password: $pass');
                 },
                 child: Text(
                     "Login",
@@ -94,4 +105,46 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void>loginUser(BuildContext context) async{
+    
+    
+    try{
+      final response = await authService.login(email.text, password.text);
+
+      final role = await authService.getUserRole();
+
+      if(role == 'ADMIN'){
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminPage()),
+        );
+      }     else if(role == 'EMPLOYEE'){
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => EmployeePage()),
+        );
+      }     else if(role == 'USER'){
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => UserPage()),
+        );
+      }
+
+      else{
+        print('Unknown role: $role');
+        }
+
+
+    }
+    catch(error){
+      print('Login failed: $error');
+    }
+    
+  }
+
+
+
+
+  //last
 }
