@@ -401,7 +401,6 @@ class _RegistrationState extends State<Registration> {
         // "email":email.text,
         "phoneNumber":phoneNumber.text,
         // "gender":selectedGender?? "other",
-
         "address":address.text,
         "dateOfBirth": selectedDOB?.toIso8601String()?? "",
         "nid": nid.text,
@@ -409,6 +408,7 @@ class _RegistrationState extends State<Registration> {
         "balance": double.tryParse(balance.text) ?? 0.0,
         "accountOpeningDate": selectedOpeningDate?.toIso8601String()?? "",
         "user": user,
+        "role":"USER"
 
       };
 

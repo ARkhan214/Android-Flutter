@@ -1,0 +1,38 @@
+POST  http://localhost:8085/api/user/
+
+Body ---->Form data---->
+Key-------user,photo
+Value-----
+Content Type--application/json,multipart/form-data
+
+{
+  "name": "Sadier Rahman",
+  "email": "sadiar.rahman970@gmail.com",
+  "password": "12345",
+  "phoneNumber": "01711111111",
+  "dateOfBirth": "2000-01-01"
+}
+
+Robotix {
+arduino
+raspberry pi
+}
+
+EMAIL:=
+farihamariam@gmail.com
+maverickv039@gmail.com
+mdrahimkhan107107@gmail.com
+parvejmd4469@gmail.com
+sadiar.rahman970@gmail.com
+mr.t.imran11@gmail.com
+halimaaktershemanto@gmail.com
+sathekhanom550@gmail.com
+cmrejaulkarim@gmail.com
+rimunna322@gmail.com 
+mdatiqulislam59@gmail.com
+mnhasan1020@gmail.com
+
+
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtci50LmltcmFuMTFAZ21haWwuY29tIiwiaWQiOjIsInJvbGUiOiJFTVBMT1lFRSIsImlhdCI6MTc1Nzc1NTAyNSwiZXhwIjoxNzU3ODQxNDI1fQ.BEq9Kzovs04pOXMi3A_xX8ZX9kN7vTVHZC0nsJZmcao
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXZyaWNrdjAzOUBnbWFpbC5jb20iLCJpZCI6NSwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTc3NTU0MTksImV4cCI6MTc1Nzg0MTgxOX0.ZIT2dzgTPoPypSjB5sWzO62uxSfxjpeJ6sOKzWAPPfc
