@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+
 // import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart'
 //     hide Uint8List;
 
@@ -9,8 +11,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/service/authservice.dart';
 import 'package:radio_group_v2/radio_group_v2.dart';
 import 'package:radio_group_v2/radio_group_v2.dart' as v2;
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Registration extends StatefulWidget {
   const Registration({super.key});
@@ -24,15 +29,24 @@ class _RegistrationState extends State<Registration> {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController confirmpassword = TextEditingController();
-  final TextEditingController cell = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
   final TextEditingController address = TextEditingController();
 
   final RadioGroupController genderController = RadioGroupController();
   final DateTimeFieldPickerPlatform dob = DateTimeFieldPickerPlatform.material;
 
+  final TextEditingController nid = TextEditingController();
+  final TextEditingController accountType = TextEditingController();
+  final TextEditingController balance = TextEditingController();
+  final DateTimeFieldPickerPlatform accountOpeningDate = DateTimeFieldPickerPlatform.material;
+
+
+  final String baseUrl = "http://localhost:8085";
+
   String? selectedGender;
 
   DateTime? selectedDOB;
+  DateTime? selectedOpeningDate;
 
   XFile? selectedImage;
   Uint8List? webImage;
@@ -47,6 +61,7 @@ class _RegistrationState extends State<Registration> {
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
+            key: _formkey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
 
@@ -98,7 +113,7 @@ class _RegistrationState extends State<Registration> {
                 SizedBox(height: 20.0),
 
                 TextField(
-                  controller: cell,
+                  controller: phoneNumber,
                   decoration: InputDecoration(
                     labelText: "Cell Number",
                     border: OutlineInputBorder(),
@@ -146,31 +161,84 @@ class _RegistrationState extends State<Registration> {
                 //     )
                 //   ],
                 // )
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                    children: [
-                      const Text(
-                        "Gender: ",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      v2.RadioGroup(
-                        controller: genderController,
-                        values: const ["Male", "Female", "other"],
-                        indexOfDefault: 0,
-                        orientation: RadioGroupOrientation.horizontal,
-                        onChanged: (newValue) {
-                          setState(() {
-                            selectedGender = newValue.toString();
-                          });
-                        },
-                      ),
-                    ],
+                //================For Gender=================
+                // Align(
+                //   alignment: Alignment.centerLeft,
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //
+                //     children: [
+                //       const Text(
+                //         "Gender: ",
+                //         style: TextStyle(fontWeight: FontWeight.bold),
+                //       ),
+                //       v2.RadioGroup(
+                //         controller: genderController,
+                //         values: const ["Male", "Female", "other"],
+                //         indexOfDefault: 0,
+                //         orientation: RadioGroupOrientation.horizontal,
+                //         onChanged: (newValue) {
+                //           setState(() {
+                //             selectedGender = newValue.toString();
+                //           });
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
+                //=======================
+
+
+                TextField(
+                  controller: nid,
+                  decoration: InputDecoration(
+                    labelText: "NID Number",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.credit_card),
                   ),
                 ),
 
+                SizedBox(height: 20.0),
+
+                TextField(
+                  controller: accountType,
+                  decoration: InputDecoration(
+                    labelText: "Account Type (e.g. SAVINGS/CURRENT)",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.account_balance),
+                  ),
+                ),
+
+                SizedBox(height: 20.0),
+
+                TextField(
+                  controller: balance,
+                  decoration: InputDecoration(
+                    labelText: "Initial Deposit (৳)",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.attach_money),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+
+                SizedBox(height: 20.0),
+
+                DateTimeFormField(
+                  decoration: const InputDecoration(labelText: "Account Opening Date"),
+
+                  mode: DateTimeFieldPickerMode.date,
+                  pickerPlatform: accountOpeningDate,
+
+                  onChanged: (DateTime? value) {
+                    setState(() {
+                      selectedOpeningDate= value;
+                    });
+                  },
+                ),
+
+                //========================
                 SizedBox(height: 20.0),
 
                 TextButton.icon(
@@ -202,8 +270,27 @@ class _RegistrationState extends State<Registration> {
 
                 SizedBox(height: 20.0),
 
+                // ElevatedButton(
+                //   onPressed: () {},
+                //   child: Text(
+                //     "Registration",
+                //     style: TextStyle(
+                //       fontWeight: FontWeight.w600,
+                //       fontFamily: GoogleFonts.lato().fontFamily,
+                //     ),
+                //   ),
+                //
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.blueAccent,
+                //     foregroundColor: Colors.white,
+                //   ),
+                // ),
+
+
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _register();
+                  },
                   child: Text(
                     "Registration",
                     style: TextStyle(
@@ -211,7 +298,6 @@ class _RegistrationState extends State<Registration> {
                       fontFamily: GoogleFonts.lato().fontFamily,
                     ),
                   ),
-
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
@@ -262,6 +348,106 @@ class _RegistrationState extends State<Registration> {
       }
     }
   }
+
+  Future<void> pickeImage()async{
+    if(kIsWeb){
+      var pickedImage = await ImagePickerWeb.getImageAsBytes();
+      if(pickedImage != null){
+        setState(() {
+          webImage = pickedImage;
+        });
+      }
+    } else{
+      final XFile? pickedImage =
+      await _picker.pickImage(source: ImageSource.gallery);
+      if(pickedImage !=null){
+        setState(() {
+          selectedImage=pickedImage;
+        });
+      }
+    }
+  }
+
+
+  void _register() async{
+    if(_formkey.currentState!.validate()){
+      if(password.text != confirmpassword.text){
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Password do not match!!!'))
+        );
+        return ;
+      }
+
+      if(kIsWeb){
+        if(webImage == null){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Please select an image.')),
+          );
+          return;
+        }
+      }
+
+      final user = {
+        "name":name.text,
+        "email":email.text,
+        "phoneNumber":phoneNumber.text,
+        "password":password.text,
+        "dateOfBirth": selectedDOB?.toIso8601String()?? "",
+      };
+
+
+      final account = {
+        "name":name.text,
+        // "email":email.text,
+        "phoneNumber":phoneNumber.text,
+        // "gender":selectedGender?? "other",
+
+        "address":address.text,
+        "dateOfBirth": selectedDOB?.toIso8601String()?? "",
+        "nid": nid.text,
+        "accountType": accountType.text,
+        "balance": double.tryParse(balance.text) ?? 0.0,
+        "accountOpeningDate": selectedOpeningDate?.toIso8601String()?? "",
+        "user": user,
+
+      };
+
+      final apiService = AuthService();
+
+      bool success = false;
+
+      if(kIsWeb && webImage !=null){
+        success = await apiService.registerAccount(
+            user: user,
+            account: account,
+          photoByte: webImage!,
+        );
+      } else if(selectedImage != null){
+        success = await apiService.registerAccount(
+            user: user,
+            account: account,
+          photofile: File(selectedImage!
+              .path)
+        );
+      }
+
+
+      if (success){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration Successful'))
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+
+      }else{
+
+      }
+
+    }
+  }
+
 
   //last
 }
