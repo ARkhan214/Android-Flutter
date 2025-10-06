@@ -3,13 +3,13 @@
 
 import 'package:flutter/material.dart';
 
-class UserPage extends StatelessWidget {
-  const UserPage({super.key});
+class EmployeePage extends StatelessWidget {
+  const EmployeePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text('User Page'),
+      body: Text('Employee Profile'),
     );
   }
 }

@@ -3,13 +3,13 @@
 
 import 'package:flutter/material.dart';
 
-class AdminPage extends StatelessWidget {
-  const AdminPage({super.key});
+class UserPage extends StatelessWidget {
+  const UserPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text('Admin Page'),
+      body: Text('Account Holder Profile'),
     );
   }
 }

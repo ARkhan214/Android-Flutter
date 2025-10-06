@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mk_bank_project/page/adminpage.dart';
-import 'package:mk_bank_project/page/employeepage.dart';
+import 'package:mk_bank_project/admin/admin_profile_page.dart';
+import 'package:mk_bank_project/employee/employee_profile_page.dart';
 import 'package:mk_bank_project/page/registrationpage.dart';
-import 'package:mk_bank_project/page/userpage.dart';
+import 'package:mk_bank_project/account/accounts_profile_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
 class LoginPage extends StatelessWidget {
