@@ -17,7 +17,7 @@ Future<Map<String,dynamic>?> getAccountsProfile()async{
     return null; 
   }
   
-  final url = Uri.parse('$baseUrl/api/user/profile');
+  final url = Uri.parse('$baseUrl/api/account/profile');
   final response = await http.get(
     url,
     headers:{

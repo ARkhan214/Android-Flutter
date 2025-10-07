@@ -10,7 +10,7 @@ class AccountsProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String baseUrl = "http://localhost:8085/images/user/";
+    final String baseUrl = "http://localhost:8085/images/account/";
 
     final String? photoName = profile['photo'];
 
@@ -51,7 +51,7 @@ class AccountsProfile extends StatelessWidget {
               ),
             ),
 
-            // 🟣 Menu Items (you can add more later)
+            //  Menu Items (you can add more later)
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('My Profile'),
@@ -88,7 +88,7 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             const Divider(), // Thin line separator
-            // 🔴 Logout Option
+            //  Logout Option
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
@@ -115,7 +115,7 @@ class AccountsProfile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🟣 Profile Picture Section
+            //  Profile Picture Section
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle, // Ensures circular border
@@ -143,7 +143,7 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🟣 Display Job Seeker Name
+            //  Display Job Seeker Name
             Text(
               profile['name'] ?? 'Unknown',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -151,24 +151,16 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // 🟣 Display User Email (nested under user object)
-            Text(
-              "Email: ${profile['user']?['email'] ?? 'N/A'}",
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
 
-            const SizedBox(height: 10),
-
-            // 🟣 Display Skills
+            //  Display User Email (nested under user object)
             // Text(
-            //   "Skills: ${profile['skills'] ?? 'N/A'}",
-            //   style: const TextStyle(fontSize: 16),
-            //   textAlign: TextAlign.center,
+            //   "Email: ${profile['user']?['email'] ?? 'N/A'}",
+            //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             // ),
             //
-            // const SizedBox(height: 30),
+            // const SizedBox(height: 10),
 
-            // 🟣 Phone Number
+            //  Phone Number
             Text(
               "Phone: ${profile['phoneNumber'] ?? 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -176,15 +168,22 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // 🟣 Username
             Text(
-              "Username: ${profile['username'] ?? 'N/A'}",
+              "balance: ${profile['balance'] ?? 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
 
             const SizedBox(height: 10),
 
-            // 🟣 Date of Birth
+            //  Username
+            // Text(
+            //   "Username: ${profile['username'] ?? 'N/A'}",
+            //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            // ),
+            //
+            // const SizedBox(height: 10),
+
+            //  Date of Birth
             Text(
               "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -192,7 +191,7 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // 🟣 Role
+            //  Role
             Text(
               "Role: ${profile['role'] ?? 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -200,21 +199,18 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // 🟣 Active Status
+            //  Active Status
             Text(
-              "Status: ${(profile['active'] == true) ? 'Active ✅' : 'Inactive ❌'}",
+              "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
               style: TextStyle(
-                  fontSize: 16,
-                  color: (profile['active'] == true)
-                      ? Colors.green
-                      : Colors.red),
+                fontSize: 16,
+                color: (profile['active'] == true) ? Colors.green : Colors.red,
+              ),
             ),
 
             const SizedBox(height: 30),
 
-
-
-            // 🟣 Button for Editing Profile
+            //  Button for Editing Profile
             ElevatedButton.icon(
               onPressed: () {
                 // TODO: Add edit functionality or navigation
