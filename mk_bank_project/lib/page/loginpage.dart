@@ -3,7 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mk_bank_project/admin/admin_profile_page.dart';
 import 'package:mk_bank_project/employee/employee_profile_page.dart';
 import 'package:mk_bank_project/page/registrationpage.dart';
-import 'package:mk_bank_project/account/accounts_profile_page.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
 class LoginPage extends StatelessWidget {
@@ -20,6 +21,7 @@ class LoginPage extends StatelessWidget {
 
   final storage = new FlutterSecureStorage();
   AuthService authService = AuthService();
+  AccountService accountService = AccountService();
 
   @override
   Widget build(BuildContext context) {
@@ -119,16 +121,25 @@ class LoginPage extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => AdminPage()),
         );
-      }     else if(role == 'EMPLOYEE'){
+      }
+
+      else if(role == 'EMPLOYEE'){
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => EmployeePage()),
         );
-      }     else if(role == 'USER'){
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => UserPage()),
-        );
+      }
+
+      else if(role == 'USER'){
+        final profile = await accountService.getAccountsProfile();
+if(profile != null){
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+        builder: (context) => AccountsProfile(profile: profile)
+    ),
+  );
+}
       }
 
       else{
