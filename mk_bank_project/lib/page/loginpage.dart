@@ -8,7 +8,6 @@ import 'package:mk_bank_project/service/account_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
 class LoginPage extends StatelessWidget {
-
   // =================Shortcut==========
   // Line Alaignment = ctrl+alt+L
   // Selection Duplicate = ctrl+D
@@ -40,122 +39,95 @@ class LoginPage extends StatelessWidget {
               ),
             ),
 
-            SizedBox(
-              height: 20.0,
-            ),
+            SizedBox(height: 20.0),
 
             TextField(
               controller: password,
-              obscureText:true,
+              obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.lock),
-
               ),
             ),
 
-            SizedBox(
-              height: 20.0,
-            ),
-
+            SizedBox(height: 20.0),
 
             ElevatedButton(
-                onPressed: (){
-                  
-                  loginUser(context);
-                  
-                    // String em = email.text;
-                    // String pass = password.text;
-                    // print('Email: $em,Password: $pass');
-                },
-                child: Text(
-                    "Login",
-                        style:TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w800,
-                        ),
-                ),
+              onPressed: () {
+                loginUser(context);
+
+                // String em = email.text;
+                // String pass = password.text;
+                // print('Email: $em,Password: $pass');
+              },
+              child: Text(
+                "Login",
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+              ),
 
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                foregroundColor: Colors.white
+                foregroundColor: Colors.white,
               ),
             ),
-
 
             SizedBox(height: 20.0),
 
             TextButton(
-                onPressed:(){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Registration()),
-                  );
-                },
-                child: Text(
-                  "Registration here",
-                  style: TextStyle(
-                      color: Colors.green,
-                      decoration: TextDecoration.none
-                  ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Registration()),
+                );
+              },
+              child: Text(
+                "Registration here",
+                style: TextStyle(
+                  color: Colors.green,
+                  decoration: TextDecoration.none,
                 ),
+              ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Future<void>loginUser(BuildContext context) async{
-    
-    
-    try{
+  Future<void> loginUser(BuildContext context) async {
+    try {
       final response = await authService.login(email.text, password.text);
 
       final role = await authService.getUserRole();
 
-      if(role == 'ADMIN'){
+      if (role == 'ADMIN') {
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => AdminPage()),
+          context,
+          MaterialPageRoute(builder: (context) => AdminPage()),
         );
-      }
-
-      else if(role == 'EMPLOYEE'){
+      } else if (role == 'EMPLOYEE') {
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => EmployeePage()),
+          context,
+          MaterialPageRoute(builder: (context) => EmployeePage()),
         );
-      }
-
-      else if(role == 'USER'){
+      } else if (role == 'USER') {
         final profile = await accountService.getAccountsProfile();
-if(profile != null){
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-        builder: (context) => AccountsProfile(profile: profile)
-    ),
-  );
-}
-      }
-
-      else{
-        print('Unknown role: $role');
+        if (profile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AccountsProfile(profile: profile),
+            ),
+          );
         }
-
-
-    }
-    catch(error){
+      } else {
+        print('Unknown role: $role');
+      }
+    } catch (error) {
       print('Login failed: $error');
     }
-    
   }
-
-
-
 
   //last
 }

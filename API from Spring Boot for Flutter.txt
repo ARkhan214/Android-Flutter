@@ -1,1 +1,2 @@
 GET-http://localhost:8085/api/user/profile
+GET-http://localhost:8085/api/account/profile

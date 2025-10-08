@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
@@ -52,11 +53,22 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             //  Menu Items (you can add more later)
+            // ListTile(
+            //   leading: const Icon(Icons.person),
+            //   title: const Text('View Profile'),
+            //   onTap: () {
+            //     Navigator.pop(context); // Close the drawer
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('My Profile'),
+              title: const Text('View Profile'),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
               },
             ),
 
@@ -142,6 +154,11 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
+            Text(
+              "ACCOUNT ID: ${profile['id'] ?? 'N/A'}",
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 20),
 
             //  Display Job Seeker Name
             Text(
@@ -151,7 +168,36 @@ class AccountsProfile extends StatelessWidget {
 
             const SizedBox(height: 10),
 
+            //  Active Status
+            Text(
+              "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
+              style: TextStyle(
+                fontSize: 16,
+                color: (profile['active'] == true) ? Colors.green : Colors.red,
+              ),
+            ),
 
+            const SizedBox(height: 10),
+
+            Text(
+              "Account Type: ${profile['accountType'] ?? 'N/A'}",
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              "balance: ${profile['balance'] ?? 'N/A'}",
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              "NID: ${profile['nid'] ?? 'N/A'}",
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 10),
             //  Display User Email (nested under user object)
             // Text(
             //   "Email: ${profile['user']?['email'] ?? 'N/A'}",
@@ -167,9 +213,8 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
             Text(
-              "balance: ${profile['balance'] ?? 'N/A'}",
+              "Address: ${profile['address'] ?? 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
 
@@ -190,22 +235,17 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
-            //  Role
             Text(
-              "Role: ${profile['role'] ?? 'N/A'}",
+              "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}",
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
 
             const SizedBox(height: 10),
 
-            //  Active Status
+            //  Role
             Text(
-              "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
-              style: TextStyle(
-                fontSize: 16,
-                color: (profile['active'] == true) ? Colors.green : Colors.red,
-              ),
+              "Role: ${profile['role'] ?? 'N/A'}",
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
 
             const SizedBox(height: 30),
