@@ -1,4 +1,3 @@
-=============new code====08/10/2025=========
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
@@ -123,162 +122,6 @@ class AccountsProfile extends StatelessWidget {
       // ----------------------------
       // BODY: Main content area
       // ----------------------------
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(20.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             //  Profile Picture Section
-//             Container(
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle, // Ensures circular border
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black26,
-//                     blurRadius: 8,
-//                     offset: Offset(0, 4),
-//                   ),
-//                 ],
-//                 border: Border.all(
-//                   color: Colors.purple, // Border color around image
-//                   width: 3,
-//                 ),
-//               ),
-//               child: CircleAvatar(
-//                 radius: 60, // Image size
-//                 backgroundColor: Colors.grey[200],
-//                 backgroundImage: (photoUrl != null)
-//                     ? NetworkImage(photoUrl) // From backend
-//                     : const AssetImage('assets/default_avatar.png')
-//                           as ImageProvider, // Local default image
-//               ),
-//             ),
-//
-//             const SizedBox(height: 20),
-//             Center(
-//               child: Text(
-//                 "ACCOUNT ID: ${profile['id'] ?? 'N/A'}",
-//                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//
-//             //  Display Job Seeker Name
-//             Text(
-//               profile['name'] ?? 'Unknown',
-//               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Active Status
-//             Text(
-//               "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
-//               style: TextStyle(
-//                 fontSize: 16,
-//                 color: (profile['active'] == true) ? Colors.green : Colors.red,
-//               ),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "Account Type: ${profile['accountType'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "balance: ${profile['balance'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "NID: ${profile['nid'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//             const SizedBox(height: 10),
-//             //  Display User Email (nested under user object)
-//             // Text(
-//             //   "Email: ${profile['user']?['email'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Phone Number
-//             Text(
-//               "Phone: ${profile['phoneNumber'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Address: ${profile['address'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Username
-//             // Text(
-//             //   "Username: ${profile['username'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Date of Birth
-//             Text(
-//               "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Role
-//             Text(
-//               "Role: ${profile['role'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 30),
-//
-//             //  Button for Editing Profile
-//             ElevatedButton.icon(
-//               onPressed: () {
-//                 // TODO: Add edit functionality or navigation
-//               },
-//               icon: const Icon(Icons.edit),
-//               label: const Text("Edit Profile"),
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.purple,
-//                 foregroundColor: Colors.white,
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 30,
-//                   vertical: 12,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -319,7 +162,7 @@ class AccountsProfile extends StatelessWidget {
                             backgroundImage: (photoUrl != null)
                                 ? NetworkImage(photoUrl)
                                 : const AssetImage('assets/default_avatar.png')
-                            as ImageProvider,
+                                      as ImageProvider,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -332,13 +175,17 @@ class AccountsProfile extends StatelessWidget {
                               Text(
                                 profile['name'] ?? 'Unknown',
                                 style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 "ID: ${profile['id'] ?? 'N/A'}",
-                                style:
-                                TextStyle(fontSize: 16, color: Colors.grey[700]),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[700],
+                                ),
                               ),
                               const SizedBox(height: 6),
                               Text(
@@ -362,15 +209,18 @@ class AccountsProfile extends StatelessWidget {
                               Text(
                                 "Balance",
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500),
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 "${profile['balance'] ?? 'N/A'}",
                                 style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -397,18 +247,24 @@ class AccountsProfile extends StatelessWidget {
                             title: Text("NID: ${profile['nid'] ?? 'N/A'}"),
                           ),
                           ListTile(
-                            title: Text("Phone: ${profile['phoneNumber'] ?? 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text("Address: ${profile['address'] ?? 'N/A'}"),
+                            title: Text(
+                              "Phone: ${profile['phoneNumber'] ?? 'N/A'}",
+                            ),
                           ),
                           ListTile(
                             title: Text(
-                                "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}"),
+                              "Address: ${profile['address'] ?? 'N/A'}",
+                            ),
                           ),
                           ListTile(
                             title: Text(
-                                "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}"),
+                              "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}",
+                            ),
+                          ),
+                          ListTile(
+                            title: Text(
+                              "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}",
+                            ),
                           ),
                           ListTile(
                             title: Text("Role: ${profile['role'] ?? 'N/A'}"),
@@ -421,6 +277,7 @@ class AccountsProfile extends StatelessWidget {
               ),
             ),
 
+            //===============
             const SizedBox(height: 30),
 
             // Edit Profile Button
@@ -442,445 +299,144 @@ class AccountsProfile extends StatelessWidget {
           ],
         ),
       ),
-
-
-
-
     );
   }
 }
 
 
-==============Old code=============
+
+======================
+===============profile page=======
+========================
+
 import 'package:flutter/material.dart';
-import 'package:mk_bank_project/account/profile_page.dart';
-import 'package:mk_bank_project/page/loginpage.dart';
-import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/entity/profile_model.dart';
+import '../service/authservice.dart';
 
-class AccountsProfile extends StatelessWidget {
-  final Map<String, dynamic> profile;
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
+  late Future<Profile> _profileFuture;
 
-  AccountsProfile({super.key, required this.profile});
+  @override
+  void initState() {
+    super.initState();
+    _profileFuture = _authService.fetchUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final String baseUrl = "http://localhost:8085/images/account/";
-
-    final String? photoName = profile['photo'];
-
-    final String? photoUrl = (photoName != null && photoName.isNotEmpty)
-        ? "$baseUrl$photoName"
-        : null;
-
-    // return Scaffold(body: Text('Account Holder Profile'));
+    final String baseUrl = "http://localhost:8085/images/user/";
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Account Holder's Profile",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black12,
-        centerTitle: true,
-        elevation: 4,
-      ),
+      appBar: AppBar(title: const Text("My Profile")),
+      body: FutureBuilder<Profile>(
+        future: _profileFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No profile data found.'));
+          }
 
-      // DRAWER: Side navigation menu
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Colors.purple),
-              accountName: Text(
-                profile['name'] ?? 'Unknown User',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: (photoUrl != null)
-                    ? NetworkImage(photoUrl)
-                    : const AssetImage('assets/images/default_avatar.png')
-                          as ImageProvider, // Default if no photo
-              ),
-            ),
+          final profile = snapshot.data!;
 
-            //  Menu Items (you can add more later)
-            // ListTile(
-            //   leading: const Icon(Icons.person),
-            //   title: const Text('View Profile'),
-            //   onTap: () {
-            //     Navigator.pop(context); // Close the drawer
-            //   },
-            // ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('View Profile'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
-              },
-            ),
+          // Photo URL logic
+          final String? photoName = profile.photo;
+          final String? photoUrl = (photoName != null && photoName.isNotEmpty)
+              ? "$baseUrl$photoName"
+              : null;
 
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Profile'),
-              onTap: () {
-                // TODO: Add navigation to Edit Profile Page
-                Navigator.pop(context);
-              },
-            ),
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
+              children: [
+                // Photo Part: Without proper circular & zoom
 
-            ListTile(
-              leading: const Icon(Icons.work),
-              title: const Text('Applied Jobs'),
-              onTap: () {
-                // TODO: Navigate to applied jobs page
-                Navigator.pop(context);
-              },
-            ),
+                // Container(
+                //   decoration: BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: Colors.black26,
+                //         blurRadius: 8,
+                //         offset: Offset(0, 4),
+                //       ),
+                //     ],
+                //     border: Border.all(color: Colors.purple, width: 3),
+                //   ),
+                //   child: CircleAvatar(
+                //     radius: 60,
+                //     backgroundColor: Colors.grey[200],
+                //     backgroundImage: (photoUrl != null)
+                //         ? NetworkImage(photoUrl)
+                //         : const AssetImage('assets/images/default_avatar.png')
+                //               as ImageProvider,
+                //   ),
+                // ),
 
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                // TODO: Open settings page
-                Navigator.pop(context);
-              },
-            ),
-
-            const Divider(), // Thin line separator
-            //  Logout Option
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
-              onTap: () async {
-                // Clear stored token and user role
-                await _authService.logout();
-
-                // Navigate back to login page
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-
-      // ----------------------------
-      // BODY: Main content area
-      // ----------------------------
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(20.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             //  Profile Picture Section
-//             Container(
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle, // Ensures circular border
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black26,
-//                     blurRadius: 8,
-//                     offset: Offset(0, 4),
-//                   ),
-//                 ],
-//                 border: Border.all(
-//                   color: Colors.purple, // Border color around image
-//                   width: 3,
-//                 ),
-//               ),
-//               child: CircleAvatar(
-//                 radius: 60, // Image size
-//                 backgroundColor: Colors.grey[200],
-//                 backgroundImage: (photoUrl != null)
-//                     ? NetworkImage(photoUrl) // From backend
-//                     : const AssetImage('assets/default_avatar.png')
-//                           as ImageProvider, // Local default image
-//               ),
-//             ),
-//
-//             const SizedBox(height: 20),
-//             Center(
-//               child: Text(
-//                 "ACCOUNT ID: ${profile['id'] ?? 'N/A'}",
-//                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//
-//             //  Display Job Seeker Name
-//             Text(
-//               profile['name'] ?? 'Unknown',
-//               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Active Status
-//             Text(
-//               "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
-//               style: TextStyle(
-//                 fontSize: 16,
-//                 color: (profile['active'] == true) ? Colors.green : Colors.red,
-//               ),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "Account Type: ${profile['accountType'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "balance: ${profile['balance'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "NID: ${profile['nid'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//             const SizedBox(height: 10),
-//             //  Display User Email (nested under user object)
-//             // Text(
-//             //   "Email: ${profile['user']?['email'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Phone Number
-//             Text(
-//               "Phone: ${profile['phoneNumber'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Address: ${profile['address'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Username
-//             // Text(
-//             //   "Username: ${profile['username'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Date of Birth
-//             Text(
-//               "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Role
-//             Text(
-//               "Role: ${profile['role'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 30),
-//
-//             //  Button for Editing Profile
-//             ElevatedButton.icon(
-//               onPressed: () {
-//                 // TODO: Add edit functionality or navigation
-//               },
-//               icon: const Icon(Icons.edit),
-//               label: const Text("Edit Profile"),
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.purple,
-//                 foregroundColor: Colors.white,
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 30,
-//                   vertical: 12,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Column 1: Profile Photo
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.purple, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.grey[200],
-                        backgroundImage: (photoUrl != null)
-                            ? NetworkImage(photoUrl)
-                            : const AssetImage('assets/default_avatar.png')
-                        as ImageProvider,
+                // Fixed Photo Part: proper circular & zoom
+                Center(
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.purple, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: (photoUrl != null)
+                          ? Image.network(
+                        photoUrl,
+                        fit: BoxFit.cover, // <-- fixes zoom
+                        width: 120,
+                        height: 120,
+                      )
+                          : Image.asset(
+                        'assets/images/default_avatar.png',
+                        fit: BoxFit.cover,
+                        width: 120,
+                        height: 120,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // Column 2: Name, ID, Status
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profile['name'] ?? 'Unknown',
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            "ID: ${profile['id'] ?? 'N/A'}",
-                            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: (profile['active'] == true)
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Column 3: Balance
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Balance",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            "${profile['balance'] ?? 'N/A'}",
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // View Details Section
-            Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ExpansionTile(
-                title: const Text(
-                  "View Details",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  profile.name,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                children: [
-                  ListTile(
-                    title: Text("NID: ${profile['nid'] ?? 'N/A'}"),
-                  ),
-                  ListTile(
-                    title: Text("Phone: ${profile['phoneNumber'] ?? 'N/A'}"),
-                  ),
-                  ListTile(
-                    title: Text("Address: ${profile['address'] ?? 'N/A'}"),
-                  ),
-                  ListTile(
-                    title: Text(
-                        "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}"),
-                  ),
-                  ListTile(
-                    title: Text(
-                        "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}"),
-                  ),
-                  ListTile(
-                    title: Text("Role: ${profile['role'] ?? 'N/A'}"),
-                  ),
-                ],
-              ),
+                const SizedBox(height: 10),
+                Text("Email: ${profile.email}"),
+                Text("Phone: ${profile.phoneNumber}"),
+                Text("Role: ${profile.role}"),
+                Text("Active: ${profile.active}"),
+                Text("Enabled: ${profile.enabled}"),
+                Text("Date of Birth: ${profile.dateOfBirth.split("T")[0]}"),
+              ],
             ),
-            const SizedBox(height: 30),
-            ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Add edit functionality or navigation
-              },
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

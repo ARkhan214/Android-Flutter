@@ -3,6 +3,34 @@ import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
+// ----------------------------------------------------------------------
+// সমস্যার সমাধান: এখানে primaryColor-কে MaterialColor হিসেবে সংজ্ঞায়িত করা হলো
+// ----------------------------------------------------------------------
+
+// আপনার কাস্টম কালার (0xFF004D40) এর উপর ভিত্তি করে একটি MaterialColor তৈরি করা হয়েছে।
+// MaterialColor তৈরি করতে একটি Color Swatch (Map) দরকার হয়।
+const int _primaryValue = 0xFF004D40; // আপনার Dark Teal/Green কালার
+
+const MaterialColor primaryColor = MaterialColor(
+  _primaryValue,
+  <int, Color>{
+    50: Color(0xFFE0F2F1),
+    100: Color(0xFFB2DFDB),
+    200: Color(0xFF80CBC4),
+    300: Color(0xFF4DB6AC),
+    400: Color(0xFF26A69A),
+    500: Color(_primaryValue), // বেস কালার 500 শেড
+    600: Color(0xFF00897B),
+    700: Color(0xFF00796B), // 700 শেডের জন্য একটি কাছাকাছি গাঢ় মান
+    800: Color(0xFF00695C),
+    900: Color(0xFF004D40), // আপনার মূল মানটি 900 বা 700 হিসেবে ব্যবহার করা যেতে পারে
+  },
+);
+// Accent Color (সাধারণ Color অবজেক্ট থাকবে, কারণ এর কোনো শেড প্রয়োজন নেই)
+const Color accentColor = Color(0xFFE57373); // Light Red/Coral for accent
+
+// ----------------------------------------------------------------------
+
 class AccountsProfile extends StatelessWidget {
   final Map<String, dynamic> profile;
   final AuthService _authService = AuthService();
@@ -19,18 +47,62 @@ class AccountsProfile extends StatelessWidget {
         ? "$baseUrl$photoName"
         : null;
 
-    // return Scaffold(body: Text('Account Holder Profile'));
+    // Determine the status text and color
+    final bool isActive = profile['accountActiveStatus'] == true;
+    final String statusText = isActive ? 'Active' : 'Inactive';
+    final Color statusColor = isActive ? Colors.green.shade600 : Colors.red.shade600;
+
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade50, // Light background for contrast
       appBar: AppBar(
         title: const Text(
-          "Account Holder's Profile",
-          style: TextStyle(color: Colors.white),
+          "MK Bank",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        backgroundColor: Colors.black12,
+        backgroundColor: primaryColor,
         centerTitle: true,
-        elevation: 4,
+        elevation: 8, // Higher elevation for a prominent AppBar
+        iconTheme: const IconThemeData(color: Colors.white), // Drawer icon color
       ),
+
+      // appBar: AppBar(
+      //   title: const Text(
+      //     "MK Bank",
+      //     style: TextStyle(
+      //       color: Colors.white,
+      //       fontWeight: FontWeight.w600,
+      //     ),
+      //   ),
+      //   backgroundColor: primaryColor,
+      //   centerTitle: true,
+      //   elevation: 8, // Higher elevation for a prominent AppBar
+      //   iconTheme: const IconThemeData(color: Colors.white), // Drawer icon color
+      //   actions: [
+      //     // --------------------------------------------------------------
+      //     // ✅ এখানে আপনার লোগো যোগ করা হচ্ছে
+      //     // --------------------------------------------------------------
+      //     Padding(
+      //       padding: const EdgeInsets.only(right: 15.0), // ডানদিক থেকে কিছুটা প্যাডিং
+      //       child: Image.asset(
+      //         'assets/images/mk_bank_logo.png', // ⚠️ আপনার লোগো ফাইলের সঠিক পাথ দিন
+      //         height: 35, // লোগোর উচ্চতা নিয়ন্ত্রণ করুন
+      //         // width: 35, // যদি লোগো স্কোয়ার হয় তবে width ও দিতে পারেন
+      //         fit: BoxFit.contain, // লোগোটিকে সুন্দরভাবে ফিট করার জন্য
+      //       ),
+      //     ),
+      //     // আপনি চাইলে এখানে আরও Action Widgets যোগ করতে পারেন, যেমন:
+      //     // IconButton(
+      //     //   icon: const Icon(Icons.notifications, color: Colors.white),
+      //     //   onPressed: () {
+      //     //     // নোটিফিকেশন বাটনের কাজ
+      //     //   },
+      //     // ),
+      //   ],
+      // ),
 
       // DRAWER: Side navigation menu
       drawer: Drawer(
@@ -38,31 +110,31 @@ class AccountsProfile extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Colors.purple),
+              // ------------------------------------------------------------------
+              // ✅ সমাধান প্রয়োগ: এখন primaryColor MaterialColor হওয়ায় .shade700 কাজ করবে
+              // ------------------------------------------------------------------
+              decoration: BoxDecoration(color: primaryColor.shade700), // No ERROR now
               accountName: Text(
                 profile['name'] ?? 'Unknown User',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: (photoUrl != null)
-                    ? NetworkImage(photoUrl)
-                    : const AssetImage('assets/images/default_avatar.png')
-                          as ImageProvider, // Default if no photo
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 35,
+                  backgroundImage: (photoUrl != null)
+                      ? NetworkImage(photoUrl)
+                      : const AssetImage('assets/images/default_avatar.png')
+                  as ImageProvider, // Default if no photo
+                ),
               ),
             ),
 
-            //  Menu Items (you can add more later)
-            // ListTile(
-            //   leading: const Icon(Icons.person),
-            //   title: const Text('View Profile'),
-            //   onTap: () {
-            //     Navigator.pop(context); // Close the drawer
-            //   },
-            // ),
+            // Menu Items
             ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('View Profile'),
+              leading: Icon(Icons.person, color: primaryColor),
+              title: const Text('View Profile', style: TextStyle(fontSize: 16)),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -73,8 +145,8 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Profile'),
+              leading: Icon(Icons.edit, color: primaryColor),
+              title: const Text('Edit Profile', style: TextStyle(fontSize: 16)),
               onTap: () {
                 // TODO: Add navigation to Edit Profile Page
                 Navigator.pop(context);
@@ -82,8 +154,8 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(Icons.work),
-              title: const Text('Applied Jobs'),
+              leading: Icon(Icons.work, color: primaryColor),
+              title: const Text('Applied Jobs', style: TextStyle(fontSize: 16)),
               onTap: () {
                 // TODO: Navigate to applied jobs page
                 Navigator.pop(context);
@@ -91,8 +163,8 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              leading: Icon(Icons.settings, color: primaryColor),
+              title: const Text('Settings', style: TextStyle(fontSize: 16)),
               onTap: () {
                 // TODO: Open settings page
                 Navigator.pop(context);
@@ -100,10 +172,11 @@ class AccountsProfile extends StatelessWidget {
             ),
 
             const Divider(), // Thin line separator
-            //  Logout Option
+
+            // Logout Option
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              leading: const Icon(Icons.logout, color: accentColor),
+              title: const Text('Logout', style: TextStyle(color: accentColor, fontWeight: FontWeight.w600, fontSize: 16)),
               onTap: () async {
                 // Clear stored token and user role
                 await _authService.logout();
@@ -122,174 +195,18 @@ class AccountsProfile extends StatelessWidget {
       // ----------------------------
       // BODY: Main content area
       // ----------------------------
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(20.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             //  Profile Picture Section
-//             Container(
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle, // Ensures circular border
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black26,
-//                     blurRadius: 8,
-//                     offset: Offset(0, 4),
-//                   ),
-//                 ],
-//                 border: Border.all(
-//                   color: Colors.purple, // Border color around image
-//                   width: 3,
-//                 ),
-//               ),
-//               child: CircleAvatar(
-//                 radius: 60, // Image size
-//                 backgroundColor: Colors.grey[200],
-//                 backgroundImage: (photoUrl != null)
-//                     ? NetworkImage(photoUrl) // From backend
-//                     : const AssetImage('assets/default_avatar.png')
-//                           as ImageProvider, // Local default image
-//               ),
-//             ),
-//
-//             const SizedBox(height: 20),
-//             Center(
-//               child: Text(
-//                 "ACCOUNT ID: ${profile['id'] ?? 'N/A'}",
-//                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//               ),
-//             ),
-//             const SizedBox(height: 20),
-//
-//             //  Display Job Seeker Name
-//             Text(
-//               profile['name'] ?? 'Unknown',
-//               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Active Status
-//             Text(
-//               "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
-//               style: TextStyle(
-//                 fontSize: 16,
-//                 color: (profile['active'] == true) ? Colors.green : Colors.red,
-//               ),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "Account Type: ${profile['accountType'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "balance: ${profile['balance'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             Text(
-//               "NID: ${profile['nid'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//             const SizedBox(height: 10),
-//             //  Display User Email (nested under user object)
-//             // Text(
-//             //   "Email: ${profile['user']?['email'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Phone Number
-//             Text(
-//               "Phone: ${profile['phoneNumber'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Address: ${profile['address'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Username
-//             // Text(
-//             //   "Username: ${profile['username'] ?? 'N/A'}",
-//             //   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             // ),
-//             //
-//             // const SizedBox(height: 10),
-//
-//             //  Date of Birth
-//             Text(
-//               "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//             Text(
-//               "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 10),
-//
-//             //  Role
-//             Text(
-//               "Role: ${profile['role'] ?? 'N/A'}",
-//               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//             ),
-//
-//             const SizedBox(height: 30),
-//
-//             //  Button for Editing Profile
-//             ElevatedButton.icon(
-//               onPressed: () {
-//                 // TODO: Add edit functionality or navigation
-//               },
-//               icon: const Icon(Icons.edit),
-//               label: const Text("Edit Profile"),
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.purple,
-//                 foregroundColor: Colors.white,
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 30,
-//                   vertical: 12,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
-              elevation: 5,
+              elevation: 8, // Increased elevation for a better look
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(15), // Softer corners
               ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0), // More padding inside
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -299,29 +216,31 @@ class AccountsProfile extends StatelessWidget {
                       children: [
                         // Column 1: Profile Photo
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 85,
+                          height: 85,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.purple, width: 2),
-                            boxShadow: [
+                            border: Border.all(color: primaryColor, width: 3), // Stronger border
+                            boxShadow: const [
                               BoxShadow(
                                 color: Colors.black26,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: (photoUrl != null)
-                                ? NetworkImage(photoUrl)
-                                : const AssetImage('assets/default_avatar.png')
-                            as ImageProvider,
+                          child: ClipOval(
+                            child: CircleAvatar(
+                              radius: 42.5,
+                              backgroundColor: Colors.grey[200],
+                              backgroundImage: (photoUrl != null)
+                                  ? NetworkImage(photoUrl)
+                                  : const AssetImage('assets/images/default_avatar.png') // Note: corrected asset path to be safe
+                              as ImageProvider,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 20),
                         // Column 2: Name, ID, Status
                         Expanded(
                           flex: 3,
@@ -331,45 +250,61 @@ class AccountsProfile extends StatelessWidget {
                               Text(
                                 profile['name'] ?? 'Unknown',
                                 style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800, // Extra bold for name
+                                  color: Colors.black87,
+                                ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               Text(
-                                "ID: ${profile['id'] ?? 'N/A'}",
-                                style:
-                                TextStyle(fontSize: 16, color: Colors.grey[700]),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                "Status: ${(profile['accountActiveStatus'] == true) ? 'Active ✅' : 'Inactive ❌'}",
+                                "Account Number : ${profile['id'] ?? 'N/A'}",
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: (profile['active'] == true)
-                                      ? Colors.green
-                                      : Colors.red,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: statusColor, width: 1),
+                                ),
+                                child: Text(
+                                  "Status: $statusText",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: statusColor,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Column 3: Balance
+                        // Column 3: Balance (moved to right)
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "Balance",
+                                "Current Balance",
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500),
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
                               Text(
-                                "${profile['balance'] ?? 'N/A'}",
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                "৳ ${profile['balance']?.toStringAsFixed(2) ?? 'N/A'}", // Assuming balance is a number, added currency symbol
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: primaryColor,
+                                ),
                               ),
                             ],
                           ),
@@ -377,41 +312,37 @@ class AccountsProfile extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 25), // Increased separation
 
                     // View Details inside the same card
                     Card(
-                      color: Colors.grey[100],
-                      elevation: 0,
+                      color: Colors.white,
+                      elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: ExpansionTile(
-                        title: const Text(
-                          "View Details",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                        title: Text(
+                          "View Account Details",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                              fontSize: 18),
                         ),
                         children: [
-                          ListTile(
-                            title: Text("NID: ${profile['nid'] ?? 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text("Phone: ${profile['phoneNumber'] ?? 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text("Address: ${profile['address'] ?? 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text(
-                                "Date of Birth: ${profile['dateOfBirth'] != null ? profile['dateOfBirth'].toString().substring(0, 10) : 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text(
-                                "Account Opening Date: ${profile['accountOpeningDate'] != null ? profile['accountOpeningDate'].toString().substring(0, 10) : 'N/A'}"),
-                          ),
-                          ListTile(
-                            title: Text("Role: ${profile['role'] ?? 'N/A'}"),
-                          ),
+                          _buildDetailTile(
+                              context, "NID", profile['nid']),
+                          _buildDetailTile(
+                              context, "Phone", profile['phoneNumber']),
+                          _buildDetailTile(
+                              context, "Address", profile['address']),
+                          _buildDetailTile(
+                              context, "Date of Birth", profile['dateOfBirth'], isDate: true),
+                          _buildDetailTile(
+                              context, "Opening Date", profile['accountOpeningDate'], isDate: true),
+                          _buildDetailTile(
+                              context, "Role", profile['role']),
                         ],
                       ),
                     ),
@@ -420,31 +351,76 @@ class AccountsProfile extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 30),
+            //===============
+            const SizedBox(height: 40),
 
             // Edit Profile Button
             ElevatedButton.icon(
               onPressed: () {
                 // TODO: Add edit functionality or navigation
               },
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile"),
+              icon: const Icon(Icons.edit, size: 24),
+              label: const Text(
+                "Edit Profile Information",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
+                backgroundColor: accentColor, // Using accent color for button
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 30,
-                  vertical: 12,
+                  vertical: 15,
                 ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 5,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
 
+  // Helper method for consistent ListTile
+  Widget _buildDetailTile(BuildContext context, String label, dynamic value,
+      {bool isDate = false}) {
+    String displayValue = 'N/A';
+    if (value != null) {
+      if (isDate) {
+        displayValue = value.toString().substring(0, 10);
+      } else {
+        displayValue = value.toString();
+      }
+    }
 
-
-
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "$label:",
+            style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              displayValue,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
