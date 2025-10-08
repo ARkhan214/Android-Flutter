@@ -48,8 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.all(16.0),
             child: ListView(
               children: [
-                // Photo Part: Without proper circular & zoom
-
+                // Circle Avatar with shadow & border
                 // Container(
                 //   decoration: BoxDecoration(
                 //     shape: BoxShape.circle,
@@ -71,6 +70,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 //               as ImageProvider,
                 //   ),
                 // ),
+
+
+                // Fixed Photo Part: Circular, shadow, border, proper fit
+                // Container(
+                //   width: 120,
+                //   height: 120,
+                //   decoration: BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     border: Border.all(color: Colors.purple, width: 3),
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: Colors.black26,
+                //         blurRadius: 8,
+                //         offset: Offset(0, 4),
+                //       ),
+                //     ],
+                //     image: DecorationImage(
+                //       image: (photoUrl != null)
+                //           ? NetworkImage(photoUrl)
+                //           : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                //       fit: BoxFit.cover, // <-- ensures zoomed image fits properly
+                //     ),
+                //   ),
+                // ),
+
 
                 // Fixed Photo Part: proper circular & zoom
                 Center(
