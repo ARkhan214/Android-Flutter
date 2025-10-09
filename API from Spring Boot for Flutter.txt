@@ -1,2 +1,24 @@
+API For Login
+POST-http://localhost:8085/api/user/login
+
+API For Admin Profile
 GET-http://localhost:8085/api/user/profile
+
+API For Account Holder Profile
 GET-http://localhost:8085/api/account/profile
+
+API For Employees Profile
+GET-http://localhost:8085/api/employees/profile
+
+
+
+%%%%---URL For Image---%%%%%
+
+Url for Admin Photo(ei akta url diea admin,user,employee sobar photo pawa jabe.)
+'http://localhost:8085/images/user/'
+
+Url for Employee Photo
+'http://localhost:8085/images/employee/'
+
+Url for Account Holder Photo
+'http://localhost:8085/images/account/'

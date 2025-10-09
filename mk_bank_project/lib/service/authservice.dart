@@ -144,6 +144,8 @@ class AuthService {
   //   }
   // }
 
+
+  //===For Account Holder Profile
   Future<Profile> fetchUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
@@ -154,6 +156,33 @@ class AuthService {
 
     final response = await http.get(
       Uri.parse('$baseUrl/api/user/profile'),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return Profile.fromJson(data);
+    } else if (response.statusCode == 403 || response.statusCode == 401) {
+      throw Exception('Unauthorized. Please login again.');
+    } else {
+      throw Exception('Failed to load profile: ${response.statusCode}');
+    }
+  }
+
+  //===For Employee Profile
+  Future<Profile> fetchEmployeeProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    if (token == null) {
+      throw Exception('No token found. Please login again.');
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/employees/profile'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $token',
         HttpHeaders.contentTypeHeader: 'application/json',

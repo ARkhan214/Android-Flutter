@@ -267,6 +267,22 @@ class _ProfilePageState extends State<ProfilePage> {
                           elevation: 5,
                         ),
                       ),
+
+                      SizedBox(height: 5,),
+                      ElevatedButton(
+                        onPressed: () {
+                          // এই ফাংশনটি আপনাকে আগের স্ক্রিনে ফিরিয়ে নিয়ে যাবে
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Go Back'),
+                      ),
+
+                      SizedBox(height: 5,),
+                      ElevatedButton(
+                        onPressed: () => print('Clicked!'),
+                        child: const Text('Submit'),
+                      )
+
                     ],
                   ),
                 ),
