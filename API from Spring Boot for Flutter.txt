@@ -22,3 +22,303 @@ Url for Employee Photo
 
 Url for Account Holder Photo
 'http://localhost:8085/images/account/'
+
+
+===========================
+================Employee Profile Page===========
+===========================
+import 'package:flutter/material.dart';
+import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+import 'package:intl/intl.dart';
+
+class EmployeePage extends StatelessWidget {
+  final Map<String, dynamic> profile;
+  final AuthService _authService = AuthService();
+
+  EmployeePage({super.key, required this.profile});
+
+  // Date Formatting Function
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return 'N/A';
+    }
+    try {
+      final DateTime date = DateTime.parse(dateString);
+      // Format: 20 September, 2025
+      return DateFormat('dd MMMM, yyyy').format(date);
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  }
+
+  // Info Row Widget
+  Widget _buildProfileInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0), // Increased vertical padding
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Changed icon color to a slightly darker shade for better contrast
+          Icon(icon, color: Colors.indigo.shade700, size: 22),
+          const SizedBox(width: 15), // Increased spacing
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4), // Increased spacing
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600, // Slightly bolder value
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Base URL and Photo URL Calculation
+    const String baseUrl = "http://localhost:8085/images/employee/";
+    final String photoName = profile['photo'] ?? '';
+    final String? photoUrl = (photoName.isNotEmpty)
+        ? "$baseUrl$photoName"
+        : null;
+
+    // Extracting data
+    final String name = profile['name'] ?? 'N/A';
+    final String position = profile['position'] ?? 'N/A';
+    final String nid = profile['nid'] ?? 'N/A';
+    final String phone = profile['phoneNumber'] ?? 'N/A';
+    final String address = profile['address'] ?? 'N/A';
+    final double salary = profile['salary'] is num ? profile['salary'].toDouble() : 0.0;
+    final String doj = _formatDate(profile['dateOfJoining']);
+    final String dob = _formatDate(profile['dateOfBirth']);
+    final String retirementDate = _formatDate(profile['retirementDate']);
+
+    // New fields from JSON data
+    final String status = profile['status'] ?? 'N/A';
+    final String role = profile['role'] ?? 'N/A';
+    final String userId = '${profile['userId'] ?? 'N/A'}';
+
+    // Status Color for Badge
+    final Color statusColor = status == 'ACTIVE' ? Colors.green.shade600 : Colors.red.shade600;
+
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100, // Light background for professional look
+      appBar: AppBar(
+        title: const Text('Employee Profile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blueAccent.shade700, // Darker accent
+        elevation: 4,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      // Drawer (No UI changes applied here as per instruction)
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text(name),
+              accountEmail: Text(position),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: photoUrl != null
+                    ? ClipOval(
+                  child: Image.network(
+                    photoUrl,
+                    fit: BoxFit.cover,
+                    width: 90,
+                    height: 90,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.person, size: 50, color: Colors.blueGrey),
+                  ),
+                )
+                    : const Icon(Icons.person, size: 50),
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.blueAccent,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+
+            // Logout
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text('Logout', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600, fontSize: 16)),
+              onTap: () async {
+                await _authService.logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0), // Increased overall padding
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            // Profile Picture
+            Center(
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.blueAccent.shade700, width: 4), // Thicker, darker border
+                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))], // Added shadow
+                  color: Colors.white,
+                ),
+                child: photoUrl != null
+                    ? ClipOval(
+                  child: Image.network(
+                    photoUrl,
+                    fit: BoxFit.cover,
+                    width: 120,
+                    height: 120,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.person_4, size: 60, color: Colors.blueGrey),
+                  ),
+                )
+                    : const Icon(Icons.person_4, size: 60, color: Colors.blueGrey),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Name, ID, Position
+            Text(
+              name,
+              style: const TextStyle(
+                fontSize: 28, // Larger name
+                fontWeight: FontWeight.w900, // Extra bold
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              position,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.deepOrange.shade600, // Changed color for position emphasis
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Status Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: statusColor, width: 1),
+              ),
+              child: Text(
+                'Status: $status',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: statusColor,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            const Divider(thickness: 1, color: Colors.grey),
+            const SizedBox(height: 16),
+
+            // Main Info Card
+            Card(
+              elevation: 6, // Higher elevation
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // Rounded corners
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    // --- Identity and System Info ---
+                    _buildSectionHeader('System & Identity Info', Icons.fingerprint),
+                    _buildProfileInfoRow(Icons.person_pin, 'Employee ID', '${profile['id'] ?? 'N/A'}'),
+                    _buildProfileInfoRow(Icons.lock_person, 'Access Role', role),
+                    _buildProfileInfoRow(Icons.person_outline, 'System User ID', userId),
+
+                    const Divider(height: 30),
+
+                    // --- Contact Details ---
+                    _buildSectionHeader('Contact & Address', Icons.contact_mail),
+                    _buildProfileInfoRow(Icons.phone, 'Contact Number', phone),
+                    _buildProfileInfoRow(Icons.location_on, 'Current Address', address),
+                    _buildProfileInfoRow(Icons.credit_card, 'National ID (NID)', nid),
+
+                    const Divider(height: 30),
+
+                    // --- Work & Financial Details ---
+                    _buildSectionHeader('Employment Details', Icons.work),
+                    _buildProfileInfoRow(Icons.money, 'Monthly Salary', NumberFormat.currency(locale: 'bn_BD', symbol: '৳').format(salary)),
+                    _buildProfileInfoRow(Icons.date_range, 'Date of Joining', doj),
+                    _buildProfileInfoRow(Icons.exit_to_app, 'Target Retirement Date', retirementDate),
+                    _buildProfileInfoRow(Icons.calendar_today, 'Date of Birth (DOB)', dob),
+
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper Widget to create clear section headers
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 12.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.blueAccent.shade700, size: 28),
+          const SizedBox(width: 10),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueAccent.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,20 +1,22 @@
+
 import 'dart:convert';
 
 import 'package:mk_bank_project/service/authservice.dart';
 import 'package:http/http.dart' as http;
 
-class AccountService {
+class AdminService {
   final String baseUrl = "http://localhost:8085";
 
-  Future<Map<String, dynamic>?> getAccountsProfile() async {
+  Future<Map<String, dynamic>?> getAdminProfile() async {
+
     String? token = await AuthService().getToken();
 
     if (token == null) {
-      print('No token found,please login first.');
+      print("Please login first");
       return null;
     }
 
-    final url = Uri.parse('$baseUrl/api/account/profile');
+    final url = Uri.parse('$baseUrl/api/user/profile');
 
     final response = await http.get(
       url,
@@ -31,5 +33,5 @@ class AccountService {
     }
   }
 
-  //last
+//Last
 }

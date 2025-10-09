@@ -49,6 +49,10 @@ dependencies:
   path: ^1.9.1
   http_parser: ^4.0.0
   mime: ^2.0.0
+  getwidget: ^7.0.0
+  velocity_x: ^4.3.1
+  lottie: ^3.3.2
+  animations: ^2.1.0
 
 
 dev_dependencies:

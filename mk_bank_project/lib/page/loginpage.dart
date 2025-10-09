@@ -5,7 +5,9 @@ import 'package:mk_bank_project/employee/employee_profile_page.dart';
 import 'package:mk_bank_project/page/registrationpage.dart';
 import 'package:mk_bank_project/account/accounts_profile.dart';
 import 'package:mk_bank_project/service/account_service.dart';
+import 'package:mk_bank_project/service/admin_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/employee_service.dart';
 
 class LoginPage extends StatelessWidget {
   // =================Shortcut==========
@@ -21,6 +23,8 @@ class LoginPage extends StatelessWidget {
   final storage = new FlutterSecureStorage();
   AuthService authService = AuthService();
   AccountService accountService = AccountService();
+  EmployeeService employeeService = EmployeeService();
+  AdminService adminService = AdminService();
 
   @override
   Widget build(BuildContext context) {
@@ -102,15 +106,28 @@ class LoginPage extends StatelessWidget {
       final role = await authService.getUserRole();
 
       if (role == 'ADMIN') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AdminPage()),
-        );
+
+        final adminProfile = await adminService.getAdminProfile();
+
+        if(adminProfile != null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminPage(profile: adminProfile,)),
+          );
+        }
+
       } else if (role == 'EMPLOYEE') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => EmployeePage()),
-        );
+
+        final employeeProfile = await employeeService.getEmployeeProfile();
+
+
+        if(employeeProfile != null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => EmployeePage(profile: employeeProfile,)),
+          );
+        }
+
       } else if (role == 'USER') {
         final profile = await accountService.getAccountsProfile();
         if (profile != null) {

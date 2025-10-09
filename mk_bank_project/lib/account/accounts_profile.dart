@@ -32,6 +32,7 @@ const Color accentColor = Color(0xFFE57373); // Light Red/Coral for accent
 // ----------------------------------------------------------------------
 
 class AccountsProfile extends StatelessWidget {
+
   final Map<String, dynamic> profile;
   final AuthService _authService = AuthService();
 
