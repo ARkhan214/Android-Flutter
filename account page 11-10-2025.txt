@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
-import 'package:mk_bank_project/service/account_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
-
-import '../main.dart';
-
-final RouteObserver<PageRoute<dynamic>> routeObserver = RouteObserver<PageRoute<dynamic>>();
-
 
 // ----------------------------------------------------------------------
 // সমস্যার সমাধান: এখানে primaryColor-কে MaterialColor হিসেবে সংজ্ঞায়িত করা হলো
@@ -38,51 +32,24 @@ const Color accentColor = Color(0xFFE57373); // Light Red/Coral for accent
 
 // ----------------------------------------------------------------------
 
-class AccountsProfile extends StatefulWidget with RouteAware{
-
-  Map<String, dynamic>  profile;
-
-  AccountsProfile({super.key, required this.profile});
-
-  @override
-  State<AccountsProfile> createState() => _AccountsProfileState();
-}
-class _AccountsProfileState extends State<AccountsProfile> {
-  late Map<String, dynamic> profile;
+class AccountsProfile extends StatelessWidget {
+  final Map<String, dynamic> profile;
   final AuthService _authService = AuthService();
 
-
-
-
-
-  @override
-  void initState() {
-    super.initState();
-    profile = widget.profile; // initialize state with passed profile
-    loadProfile(); // optional: refresh from API
-  }
-
-
-
-  Future<void> loadProfile() async {
-    final fetchedProfile = await _authService.fetchUserProfile();
-    setState(() {
-      profile = fetchedProfile as Map<String, dynamic>; // no need to cast
-    });
-  }
+  AccountsProfile({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
     final String baseUrl = "http://localhost:8085/images/account/";
 
-    final String? photoName = widget.profile['photo'];
+    final String? photoName = profile['photo'];
 
     final String? photoUrl = (photoName != null && photoName.isNotEmpty)
         ? "$baseUrl$photoName"
         : null;
 
     // Determine the status text and color
-    final bool isActive = widget.profile['accountActiveStatus'] == true;
+    final bool isActive = profile['accountActiveStatus'] == true;
     final String statusText = isActive ? 'Active' : 'Inactive';
     final Color statusColor = isActive
         ? Colors.green.shade600
@@ -158,13 +125,13 @@ class _AccountsProfileState extends State<AccountsProfile> {
               decoration: BoxDecoration(color: primaryColor.shade700),
               // No ERROR now
               accountName: Text(
-                widget.profile['name'] ?? 'Unknown User',
+                profile['name'] ?? 'Unknown User',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              accountEmail: Text(widget.profile['user']?['email'] ?? 'N/A'),
+              accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
@@ -303,7 +270,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.profile['name'] ?? 'Unknown',
+                                profile['name'] ?? 'Unknown',
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w800,
@@ -313,7 +280,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                "Account Number : ${widget.profile['id'] ?? 'N/A'}",
+                                "Account Number : ${profile['id'] ?? 'N/A'}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[600],
@@ -361,7 +328,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "৳ ${widget.profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
+                                "৳ ${profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
                                 // Assuming balance is a number, added currency symbol
                                 style: TextStyle(
                                   fontSize: 22,
@@ -397,30 +364,30 @@ class _AccountsProfileState extends State<AccountsProfile> {
                           ),
                         ),
                         children: [
-                          _buildDetailTile(context, "NID", widget.profile['nid']),
+                          _buildDetailTile(context, "NID", profile['nid']),
                           _buildDetailTile(
                             context,
                             "Phone",
-                            widget.profile['phoneNumber'],
+                            profile['phoneNumber'],
                           ),
                           _buildDetailTile(
                             context,
                             "Address",
-                            widget.profile['address'],
+                            profile['address'],
                           ),
                           _buildDetailTile(
                             context,
                             "Date of Birth",
-                            widget.profile['dateOfBirth'],
+                            profile['dateOfBirth'],
                             isDate: true,
                           ),
                           _buildDetailTile(
                             context,
                             "Opening Date",
-                            widget.profile['accountOpeningDate'],
+                            profile['accountOpeningDate'],
                             isDate: true,
                           ),
-                          _buildDetailTile(context, "Role", widget.profile['role']),
+                          _buildDetailTile(context, "Role", profile['role']),
                         ],
                       ),
                     ),
