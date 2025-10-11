@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
-import 'package:mk_bank_project/service/account_service.dart';
+import 'package:mk_bank_project/page/withdraw_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
-import '../main.dart';
-
-final RouteObserver<PageRoute<dynamic>> routeObserver = RouteObserver<PageRoute<dynamic>>();
-
-
 // ----------------------------------------------------------------------
-// সমস্যার সমাধান: এখানে primaryColor-কে MaterialColor হিসেবে সংজ্ঞায়িত করা হলো
+// Custom Color Setup
 // ----------------------------------------------------------------------
 
-// আপনার কাস্টম কালার (0xFF004D40) এর উপর ভিত্তি করে একটি MaterialColor তৈরি করা হয়েছে।
-// MaterialColor তৈরি করতে একটি Color Swatch (Map) দরকার হয়।
-const int _primaryValue = 0xFF004D40; // আপনার Dark Teal/Green কালার
+const int _primaryValue = 0xFF004D40; // Dark Teal/Green
 
 const MaterialColor primaryColor = MaterialColor(_primaryValue, <int, Color>{
   50: Color(0xFFE0F2F1),
@@ -25,427 +18,290 @@ const MaterialColor primaryColor = MaterialColor(_primaryValue, <int, Color>{
   300: Color(0xFF4DB6AC),
   400: Color(0xFF26A69A),
   500: Color(_primaryValue),
-  // বেস কালার 500 শেড
   600: Color(0xFF00897B),
   700: Color(0xFF00796B),
-  // 700 শেডের জন্য একটি কাছাকাছি গাঢ় মান
   800: Color(0xFF00695C),
   900: Color(0xFF004D40),
-  // আপনার মূল মানটি 900 বা 700 হিসেবে ব্যবহার করা যেতে পারে
 });
-// Accent Color (সাধারণ Color অবজেক্ট থাকবে, কারণ এর কোনো শেড প্রয়োজন নেই)
-const Color accentColor = Color(0xFFE57373); // Light Red/Coral for accent
+
+const Color accentColor = Color(0xFFE57373); // Light Red/Coral
 
 // ----------------------------------------------------------------------
 
-class AccountsProfile extends StatefulWidget with RouteAware{
-
-  Map<String, dynamic>  profile;
+class AccountsProfile extends StatelessWidget {
+  final Map<String, dynamic> profile;
+  final AuthService _authService = AuthService();
 
   AccountsProfile({super.key, required this.profile});
 
   @override
-  State<AccountsProfile> createState() => _AccountsProfileState();
-}
-class _AccountsProfileState extends State<AccountsProfile> {
-  late Map<String, dynamic> profile;
-  final AuthService _authService = AuthService();
-
-
-
-
-
-  @override
-  void initState() {
-    super.initState();
-    profile = widget.profile; // initialize state with passed profile
-    loadProfile(); // optional: refresh from API
-  }
-
-
-
-  Future<void> loadProfile() async {
-    final fetchedProfile = await _authService.fetchUserProfile();
-    setState(() {
-      profile = fetchedProfile as Map<String, dynamic>; // no need to cast
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final String baseUrl = "http://localhost:8085/images/account/";
-
-    final String? photoName = widget.profile['photo'];
-
+    final String? photoName = profile['photo'];
     final String? photoUrl = (photoName != null && photoName.isNotEmpty)
         ? "$baseUrl$photoName"
         : null;
 
-    // Determine the status text and color
-    final bool isActive = widget.profile['accountActiveStatus'] == true;
+    final bool isActive = profile['accountActiveStatus'] == true;
     final String statusText = isActive ? 'Active' : 'Inactive';
     final Color statusColor = isActive
         ? Colors.green.shade600
         : Colors.red.shade600;
 
     return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, true); // send `true` to previous page
-          return false; // prevent default pop
-        },
-
-    child:  Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      // Light background for contrast
-      appBar: AppBar(
-        title: const Text(
-          "MK Bank",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+      onWillPop: () async {
+        Navigator.pop(context, true);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          title: const Text(
+            "MK Bank",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: primaryColor,
+          centerTitle: true,
+          elevation: 8,
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        elevation: 8,
-        // Higher elevation for a prominent AppBar
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ), // Drawer icon color
-      ),
 
-      // appBar: AppBar(
-      //   title: const Text(
-      //     "MK Bank",
-      //     style: TextStyle(
-      //       color: Colors.white,
-      //       fontWeight: FontWeight.w600,
-      //     ),
-      //   ),
-      //   backgroundColor: primaryColor,
-      //   centerTitle: true,
-      //   elevation: 8, // Higher elevation for a prominent AppBar
-      //   iconTheme: const IconThemeData(color: Colors.white), // Drawer icon color
-      //   actions: [
-      //     // --------------------------------------------------------------
-      //     // ✅ এখানে আপনার লোগো যোগ করা হচ্ছে
-      //     // --------------------------------------------------------------
-      //     Padding(
-      //       padding: const EdgeInsets.only(right: 15.0), // ডানদিক থেকে কিছুটা প্যাডিং
-      //       child: Image.asset(
-      //         'assets/images/mk_bank_logo.png', // ⚠️ আপনার লোগো ফাইলের সঠিক পাথ দিন
-      //         height: 35, // লোগোর উচ্চতা নিয়ন্ত্রণ করুন
-      //         // width: 35, // যদি লোগো স্কোয়ার হয় তবে width ও দিতে পারেন
-      //         fit: BoxFit.contain, // লোগোটিকে সুন্দরভাবে ফিট করার জন্য
-      //       ),
-      //     ),
-      //     // আপনি চাইলে এখানে আরও Action Widgets যোগ করতে পারেন, যেমন:
-      //     // IconButton(
-      //     //   icon: const Icon(Icons.notifications, color: Colors.white),
-      //     //   onPressed: () {
-      //     //     // নোটিফিকেশন বাটনের কাজ
-      //     //   },
-      //     // ),
-      //   ],
-      // ),
-
-      // DRAWER: Side navigation menu
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              // ------------------------------------------------------------------
-              // ✅ সমাধান প্রয়োগ: এখন primaryColor MaterialColor হওয়ায় .shade700 কাজ করবে
-              // ------------------------------------------------------------------
-              decoration: BoxDecoration(color: primaryColor.shade700),
-              // No ERROR now
-              accountName: Text(
-                widget.profile['name'] ?? 'Unknown User',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+        // Drawer Menu
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: primaryColor.shade700),
+                accountName: Text(
+                  profile['name'] ?? 'Unknown User',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 35,
+                    backgroundImage: (photoUrl != null)
+                        ? NetworkImage(photoUrl)
+                        : const AssetImage('assets/images/default_avatar.png')
+                              as ImageProvider,
+                  ),
                 ),
               ),
-              accountEmail: Text(widget.profile['user']?['email'] ?? 'N/A'),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: CircleAvatar(
-                  radius: 35,
-                  backgroundImage: (photoUrl != null)
-                      ? NetworkImage(photoUrl)
-                      : const AssetImage('assets/images/default_avatar.png')
-                            as ImageProvider, // Default if no photo
+              ListTile(
+                leading: Icon(Icons.person, color: primaryColor),
+                title: const Text(
+                  'View Profile',
+                  style: TextStyle(fontSize: 16),
                 ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
               ),
-            ),
-
-            // Menu Items
-            ListTile(
-              leading: Icon(Icons.person, color: primaryColor),
-              title: const Text('View Profile', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
-              },
-            ),
-
-            ListTile(
-              leading: Icon(Icons.edit, color: primaryColor),
-              title: const Text('Edit Profile', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                // TODO: Add navigation to Edit Profile Page
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: Icon(Icons.work, color: primaryColor),
-              title: const Text('Applied Jobs', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                // TODO: Navigate to applied jobs page
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: Icon(Icons.settings, color: primaryColor),
-              title: const Text('Settings', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                // TODO: Open settings page
-                Navigator.pop(context);
-              },
-            ),
-
-            const Divider(), // Thin line separator
-            // Logout Option
-            ListTile(
-              leading: const Icon(Icons.logout, color: accentColor),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  color: accentColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+              ListTile(
+                leading: const Icon(Icons.logout, color: accentColor),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
+                onTap: () async {
+                  await _authService.logout();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginPage()),
+                  );
+                },
               ),
-              onTap: () async {
-                // Clear stored token and user role
-                await _authService.logout();
-
-                // Navigate back to login page
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginPage()),
-                );
-              },
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
 
-      // ----------------------------
-      // BODY: Main content area
-      // ----------------------------
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              elevation: 8, // Increased elevation for a better look
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15), // Softer corners
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0), // More padding inside
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Top Row: Photo + Name/ID/Status + Balance
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Column 1: Profile Photo
-                        Container(
-                          width: 85,
-                          height: 85,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: primaryColor, width: 3),
-                            // Stronger border
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 8,
-                                offset: Offset(0, 4),
+        // ------------------ Body Section ------------------
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Profile Card
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 85,
+                            height: 85,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: primaryColor, width: 3),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: CircleAvatar(
+                                backgroundImage: (photoUrl != null)
+                                    ? NetworkImage(photoUrl)
+                                    : const AssetImage(
+                                            'assets/images/default_avatar.png',
+                                          )
+                                          as ImageProvider,
                               ),
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: CircleAvatar(
-                              radius: 42.5,
-                              backgroundColor: Colors.grey[200],
-                              backgroundImage: (photoUrl != null)
-                                  ? NetworkImage(photoUrl)
-                                  : const AssetImage(
-                                          'assets/images/default_avatar.png',
-                                        ) // Note: corrected asset path to be safe
-                                        as ImageProvider,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        // Column 2: Name, ID, Status
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.profile['name'] ?? 'Unknown',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w800,
-                                  // Extra bold for name
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Account Number : ${widget.profile['id'] ?? 'N/A'}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: statusColor,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Text(
-                                  "Status: $statusText",
-                                  style: TextStyle(
-                                    fontSize: 14,
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profile['name'] ?? 'Unknown',
+                                  style: const TextStyle(
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
-                                    color: statusColor,
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 6),
+                                Text(
+                                  "Account No: ${profile['id'] ?? 'N/A'}",
+                                  style: TextStyle(color: Colors.grey[700]),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: statusColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Status: $statusText",
+                                    style: TextStyle(
+                                      color: statusColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        // Column 3: Balance (moved to right)
-                        Expanded(
-                          flex: 2,
-                          child: Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                "Current Balance",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              const Text(
+                                "Balance",
+                                style: TextStyle(color: Colors.grey),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 5),
                               Text(
-                                "৳ ${widget.profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
-                                // Assuming balance is a number, added currency symbol
+                                "৳ ${profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
                                 style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
                                   color: primaryColor,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 25), // Increased separation
-                    // View Details inside the same card
-                    Card(
-                      color: Colors.white,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        ],
                       ),
-                      child: ExpansionTile(
-                        tilePadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 5,
-                        ),
+                      const SizedBox(height: 20),
+                      ExpansionTile(
                         title: Text(
                           "View Account Details",
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
                             color: primaryColor,
+                            fontWeight: FontWeight.w700,
                             fontSize: 18,
                           ),
                         ),
                         children: [
-                          _buildDetailTile(context, "NID", widget.profile['nid']),
+                          _buildDetailTile(context, "NID", profile['nid']),
                           _buildDetailTile(
                             context,
                             "Phone",
-                            widget.profile['phoneNumber'],
+                            profile['phoneNumber'],
                           ),
                           _buildDetailTile(
                             context,
                             "Address",
-                            widget.profile['address'],
+                            profile['address'],
                           ),
                           _buildDetailTile(
                             context,
                             "Date of Birth",
-                            widget.profile['dateOfBirth'],
+                            profile['dateOfBirth'],
                             isDate: true,
                           ),
                           _buildDetailTile(
                             context,
                             "Opening Date",
-                            widget.profile['accountOpeningDate'],
+                            profile['accountOpeningDate'],
                             isDate: true,
                           ),
-                          _buildDetailTile(context, "Role", widget.profile['role']),
+                          _buildDetailTile(
+                            context,
+                            "Role",
+                            profile['role'] ?? 'User',
+                          ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            //==============================manue card start============
-            Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: List.generate(3, (rowIndex) {
-                    return Row(
-                      children: List.generate(3, (colIndex) {
-                        Widget buttonWidget;
 
-                        // প্রথম বাটন: Money Transfer
-                        if (rowIndex == 0 && colIndex == 0) {
-                          buttonWidget = ElevatedButton(
-                            onPressed: () {
+              const SizedBox(height: 25),
+
+              // ------------------ Dashboard Buttons ------------------
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _buildDashboardButton(
+                            context,
+                            "Money Transfer",
+                            Icons.send,
+                            primaryColor,
+                            () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -453,78 +309,129 @@ class _AccountsProfileState extends State<AccountsProfile> {
                                 ),
                               );
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                            ),
-                            child: const Text(
-                              "Money Transfer",
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        } else {
-                          // Placeholder buttons for future
-                          buttonWidget = ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey.shade300,
-                              foregroundColor: Colors.black87,
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                            ),
-                            child: Text("Button ${rowIndex * 3 + colIndex + 1}"),
-                          );
-                        }
-
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: buttonWidget,
                           ),
-                        );
-                      }),
-                    );
-                  }),
+                          _buildDashboardButton(
+                            context,
+                            "Deposit",
+                            Icons.account_balance_wallet,
+                            Colors.teal,
+                            () {},
+                          ),
+                          _buildDashboardButton(
+                            context,
+                            "Withdraw",
+                            Icons.money_off,
+                            Colors.deepOrange,
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const WithdrawPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _buildDashboardButton(
+                            context,
+                            "Transactions",
+                            Icons.history,
+                            Colors.indigo,
+                            () {},
+                          ),
+                          _buildDashboardButton(
+                            context,
+                            "Profile",
+                            Icons.person,
+                            Colors.blueGrey,
+                            () {},
+                          ),
+                          _buildDashboardButton(
+                            context,
+                            "Check Balance",
+                            Icons.account_balance,
+                            Colors.green,
+                            () {},
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _buildDashboardButton(
+                            context,
+                            "Account Info",
+                            Icons.info,
+                            Colors.purple,
+                            () {},
+                          ),
+                          _buildDashboardButton(
+                            context,
+                            "Settings",
+                            Icons.settings,
+                            Colors.brown,
+                            () {},
+                          ),
+                          _buildDashboardButton(
+                            context,
+                            "Logout",
+                            Icons.logout,
+                            Colors.red,
+                            () async {
+                              await _authService.logout();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (_) => LoginPage()),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-
-            //==============================manue card end============
-
-            //===============
-            const SizedBox(height: 40),
-
-            // Edit Profile Button
-            ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Add edit functionality or navigation
-              },
-              icon: const Icon(Icons.edit, size: 24),
-              label: const Text(
-                "Edit Profile Information",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: accentColor,
-                // Using accent color for button
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 15,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 5,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    )
     );
   }
 
-  // Helper method for consistent ListTile
+  // ✅ Dashboard Button Builder Method (এটা build() এর বাইরে থাকবে)
+  Widget _buildDashboardButton(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: ElevatedButton.icon(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          icon: Icon(icon, size: 20),
+          label: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ✅ Detail Tile Builder
   Widget _buildDetailTile(
     BuildContext context,
     String label,
@@ -533,11 +440,9 @@ class _AccountsProfileState extends State<AccountsProfile> {
   }) {
     String displayValue = 'N/A';
     if (value != null) {
-      if (isDate) {
-        displayValue = value.toString().substring(0, 10);
-      } else {
-        displayValue = value.toString();
-      }
+      displayValue = isDate
+          ? value.toString().substring(0, 10)
+          : value.toString();
     }
 
     return Padding(
@@ -553,7 +458,6 @@ class _AccountsProfileState extends State<AccountsProfile> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(width: 10),
           Flexible(
             child: Text(
               displayValue,

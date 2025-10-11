@@ -10,6 +10,9 @@ GET-http://localhost:8085/api/account/profile
 API For Employees Profile
 GET-http://localhost:8085/api/employees/profile
 
+API For Cashout
+POST-http://localhost:8085/api/transactions/add
+
 
 
 %%%%---URL For Image---%%%%%
