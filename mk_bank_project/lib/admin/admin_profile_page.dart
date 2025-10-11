@@ -124,7 +124,7 @@ class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 1. Data Extraction (আপনার দেওয়া JSON অনুযায়ী)
-    const String baseUrl = "http://localhost:8085/images/employee/"; // Photo URL এর জন্য
+    const String baseUrl = "http://localhost:8085/images/user/"; // Photo URL এর জন্য
     final String photoName = profile['photo'] ?? '';
     final String? photoUrl = (photoName.isNotEmpty)
         ? "$baseUrl$photoName"
