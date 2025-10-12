@@ -63,7 +63,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("${result.amount} Taka Withdraw Successful! ✅"),
+          content: Text("${result.amount} Taka Withdraw Successful!"),
           backgroundColor: Colors.green,
         ),
       );
@@ -74,7 +74,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Withdraw Failed ❌: $e"),
+          content: Text("Withdraw Failed: $e"),
           backgroundColor: Colors.redAccent,
         ),
       );

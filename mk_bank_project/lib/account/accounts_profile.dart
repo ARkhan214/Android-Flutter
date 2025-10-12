@@ -10,7 +10,6 @@ import 'package:mk_bank_project/service/authservice.dart';
 // ----------------------------------------------------------------------
 
 const int _primaryValue = 0xFF004D40; // Dark Teal/Green
-
 const MaterialColor primaryColor = MaterialColor(_primaryValue, <int, Color>{
   50: Color(0xFFE0F2F1),
   100: Color(0xFFB2DFDB),
@@ -36,17 +35,19 @@ class AccountsProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double fontScale = screenWidth / 390; // responsive scaling
+
     final String baseUrl = "http://localhost:8085/images/account/";
     final String? photoName = profile['photo'];
-    final String? photoUrl = (photoName != null && photoName.isNotEmpty)
-        ? "$baseUrl$photoName"
-        : null;
+    final String? photoUrl =
+    (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
 
     final bool isActive = profile['accountActiveStatus'] == true;
     final String statusText = isActive ? 'Active' : 'Inactive';
-    final Color statusColor = isActive
-        ? Colors.green.shade600
-        : Colors.red.shade600;
+    final Color statusColor =
+    isActive ? Colors.green.shade600 : Colors.red.shade600;
 
     return WillPopScope(
       onWillPop: () async {
@@ -56,9 +57,13 @@ class AccountsProfile extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.grey.shade50,
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             "MK Bank",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 18 * fontScale,
+            ),
           ),
           backgroundColor: primaryColor,
           centerTitle: true,
@@ -75,12 +80,15 @@ class AccountsProfile extends StatelessWidget {
                 decoration: BoxDecoration(color: primaryColor.shade700),
                 accountName: Text(
                   profile['name'] ?? 'Unknown User',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 17 * fontScale,
                   ),
                 ),
-                accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
+                accountEmail: Text(
+                  profile['user']?['email'] ?? 'N/A',
+                  style: TextStyle(fontSize: 14 * fontScale),
+                ),
                 currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
@@ -88,15 +96,15 @@ class AccountsProfile extends StatelessWidget {
                     backgroundImage: (photoUrl != null)
                         ? NetworkImage(photoUrl)
                         : const AssetImage('assets/images/default_avatar.png')
-                              as ImageProvider,
+                    as ImageProvider,
                   ),
                 ),
               ),
               ListTile(
                 leading: Icon(Icons.person, color: primaryColor),
-                title: const Text(
+                title: Text(
                   'View Profile',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 15 * fontScale),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -110,12 +118,12 @@ class AccountsProfile extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.logout, color: accentColor),
-                title: const Text(
+                title: Text(
                   'Logout',
                   style: TextStyle(
                     color: accentColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: 15 * fontScale,
                   ),
                 ),
                 onTap: () async {
@@ -132,7 +140,7 @@ class AccountsProfile extends StatelessWidget {
 
         // ------------------ Body Section ------------------
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(16.0 * fontScale),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -143,18 +151,18 @@ class AccountsProfile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(16.0 * fontScale),
                   child: Column(
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 85,
-                            height: 85,
+                            width: 75 * fontScale,
+                            height: 75 * fontScale,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: primaryColor, width: 3),
+                              border: Border.all(color: primaryColor, width: 2),
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
@@ -168,34 +176,35 @@ class AccountsProfile extends StatelessWidget {
                                 backgroundImage: (photoUrl != null)
                                     ? NetworkImage(photoUrl)
                                     : const AssetImage(
-                                            'assets/images/default_avatar.png',
-                                          )
-                                          as ImageProvider,
+                                    'assets/images/default_avatar.png')
+                                as ImageProvider,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 20),
+                          SizedBox(width: 12 * fontScale),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   profile['name'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                    fontSize: 22,
+                                  style: TextStyle(
+                                    fontSize: 18 * fontScale,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: 4 * fontScale),
                                 Text(
                                   "Account No: ${profile['id'] ?? 'N/A'}",
-                                  style: TextStyle(color: Colors.grey[700]),
+                                  style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 13 * fontScale),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 6 * fontScale),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10 * fontScale,
+                                    vertical: 3 * fontScale,
                                   ),
                                   decoration: BoxDecoration(
                                     color: statusColor.withOpacity(0.1),
@@ -210,6 +219,7 @@ class AccountsProfile extends StatelessWidget {
                                     style: TextStyle(
                                       color: statusColor,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 13 * fontScale,
                                     ),
                                   ),
                                 ),
@@ -219,16 +229,19 @@ class AccountsProfile extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Text(
+                              Text(
                                 "Balance",
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 13 * fontScale,
+                                ),
                               ),
-                              const SizedBox(height: 5),
+                              SizedBox(height: 4 * fontScale),
                               Text(
                                 "৳ ${profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
                                 style: TextStyle(
                                   color: primaryColor,
-                                  fontSize: 20,
+                                  fontSize: 18 * fontScale,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -236,45 +249,30 @@ class AccountsProfile extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 15 * fontScale),
                       ExpansionTile(
                         title: Text(
                           "View Account Details",
                           style: TextStyle(
                             color: primaryColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 18,
+                            fontSize: 16 * fontScale,
                           ),
                         ),
                         children: [
-                          _buildDetailTile(context, "NID", profile['nid']),
+                          _buildDetailTile(context, "NID", profile['nid'], fontScale),
                           _buildDetailTile(
-                            context,
-                            "Phone",
-                            profile['phoneNumber'],
-                          ),
+                              context, "Phone", profile['phoneNumber'], fontScale),
                           _buildDetailTile(
-                            context,
-                            "Address",
-                            profile['address'],
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Date of Birth",
-                            profile['dateOfBirth'],
-                            isDate: true,
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Opening Date",
-                            profile['accountOpeningDate'],
-                            isDate: true,
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Role",
-                            profile['role'] ?? 'User',
-                          ),
+                              context, "Address", profile['address'], fontScale),
+                          _buildDetailTile(context, "Date of Birth",
+                              profile['dateOfBirth'], fontScale,
+                              isDate: true),
+                          _buildDetailTile(context, "Opening Date",
+                              profile['accountOpeningDate'], fontScale,
+                              isDate: true),
+                          _buildDetailTile(context, "Role",
+                              profile['role'] ?? 'User', fontScale),
                         ],
                       ),
                     ],
@@ -282,7 +280,7 @@ class AccountsProfile extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 25),
+              SizedBox(height: 20 * fontScale),
 
               // ------------------ Dashboard Buttons ------------------
               Card(
@@ -291,104 +289,13 @@ class AccountsProfile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(10.0 * fontScale),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          _buildDashboardButton(
-                            context,
-                            "Money Transfer",
-                            Icons.send,
-                            primaryColor,
-                            () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const TransferMoneyPage(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Deposit",
-                            Icons.account_balance_wallet,
-                            Colors.teal,
-                            () {},
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Withdraw",
-                            Icons.money_off,
-                            Colors.deepOrange,
-                            () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const WithdrawPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          _buildDashboardButton(
-                            context,
-                            "Transactions",
-                            Icons.history,
-                            Colors.indigo,
-                            () {},
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Profile",
-                            Icons.person,
-                            Colors.blueGrey,
-                            () {},
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Check Balance",
-                            Icons.account_balance,
-                            Colors.green,
-                            () {},
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          _buildDashboardButton(
-                            context,
-                            "Account Info",
-                            Icons.info,
-                            Colors.purple,
-                            () {},
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Settings",
-                            Icons.settings,
-                            Colors.brown,
-                            () {},
-                          ),
-                          _buildDashboardButton(
-                            context,
-                            "Logout",
-                            Icons.logout,
-                            Colors.red,
-                            () async {
-                              await _authService.logout();
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => LoginPage()),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                      SizedBox(height: 10 * fontScale),
+
+                      // --------- Rows ----------
+                      ..._buildDashboardRows(context, fontScale),
                     ],
                   ),
                 ),
@@ -400,60 +307,213 @@ class AccountsProfile extends StatelessWidget {
     );
   }
 
-  // ✅ Dashboard Button Builder Method (এটা build() এর বাইরে থাকবে)
+  // -------------- Reusable Dashboard Rows ------------------
+  List<Widget> _buildDashboardRows(BuildContext context, double fontScale) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: _buildDashboardButton(context, "Send Money",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/10614/10614665.png",
+                color: Colors.brown,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TransferMoneyPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Mobile Recharge",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/7732/7732360.png",
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TransferMoneyPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Cash Out",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/8552/8552942.png",
+                color: Colors.deepOrange,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+        ],
+      ),
+      SizedBox(height: 12 * fontScale),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: _buildDashboardButton(context, "Transactions",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/16993/16993830.png",
+                color: Colors.deepOrange,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Pay Bill",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/2058/2058414.png",
+                color: Colors.black54,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Savings",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/12771/12771603.png",
+                color: Colors.blueGrey,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+        ],
+      ),
+      SizedBox(height: 12 * fontScale),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: _buildDashboardButton(context, "Loan",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/5571/5571405.png",
+                color: Colors.green,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Education Fee",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/6926/6926264.png",
+                color: Colors.blueGrey,
+                fontScale: fontScale,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                  );
+                }),
+          ),
+          SizedBox(width: 8 * fontScale),
+          Expanded(
+            child: _buildDashboardButton(context, "Logout",
+                imageUrl:
+                "https://cdn-icons-png.flaticon.com/128/1828/1828479.png",
+                color: Colors.red,
+                fontScale: fontScale,
+                onPressed: () async {
+                  await _authService.logout();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginPage()),
+                  );
+                }),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  // ---------------- Dashboard Button ----------------
   Widget _buildDashboardButton(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: ElevatedButton.icon(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          icon: Icon(icon, size: 20),
-          label: Text(
-            label,
+      BuildContext context,
+      String title, {
+        IconData? icon,
+        String? imageUrl,
+        Color? color,
+        required double fontScale,
+        required VoidCallback onPressed,
+      }) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color ?? Theme.of(context).primaryColor,
+        padding:
+        EdgeInsets.symmetric(vertical: 16 * fontScale, horizontal: 8 * fontScale),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: onPressed,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (imageUrl != null)
+            Image.network(imageUrl,
+                height: 25 * fontScale, width: 25 * fontScale, color: Colors.white)
+          else if (icon != null)
+            Icon(icon, size: 25 * fontScale, color: Colors.white),
+          SizedBox(height: 6 * fontScale),
+          Text(
+            title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 13 * fontScale, color: Colors.white),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // ✅ Detail Tile Builder
+  // ---------------- Detail Tile ----------------
   Widget _buildDetailTile(
-    BuildContext context,
-    String label,
-    dynamic value, {
-    bool isDate = false,
-  }) {
+      BuildContext context,
+      String label,
+      dynamic value,
+      double fontScale, {
+        bool isDate = false,
+      }) {
     String displayValue = 'N/A';
     if (value != null) {
-      displayValue = isDate
-          ? value.toString().substring(0, 10)
-          : value.toString();
+      displayValue =
+      isDate ? value.toString().substring(0, 10) : value.toString();
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      padding:
+      EdgeInsets.symmetric(horizontal: 14.0 * fontScale, vertical: 3.0 * fontScale),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             "$label:",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14 * fontScale,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w500,
             ),
@@ -462,8 +522,8 @@ class AccountsProfile extends StatelessWidget {
             child: Text(
               displayValue,
               textAlign: TextAlign.right,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14 * fontScale,
                 color: Colors.black87,
                 fontWeight: FontWeight.w600,
               ),

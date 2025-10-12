@@ -76,7 +76,6 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () async {
-
             final profile = await accountService.getAccountsProfile();
 
             if (profile != null) {
