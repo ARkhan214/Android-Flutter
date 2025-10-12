@@ -16,6 +16,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _agentNumberController = TextEditingController(
+    text: "017XXXXXXXX",
+  );
 
   bool _isLoading = false;
   late AuthService authService;
@@ -133,6 +136,25 @@ class _WithdrawPageState extends State<WithdrawPage> {
               ),
               const SizedBox(height: 20),
 
+              // 🔹 Fake Agent Number Field (UI Only)
+              // TextFormField(
+              //   enabled: true, // backend বা user input নিষ্ক্রিয় রাখবে
+              //   initialValue: "017XXXXXXXX", // এখানে যা খুশি demo value দিতে পারো
+              //   decoration: const InputDecoration(
+              //     labelText: "Agent Number",
+              //     border: OutlineInputBorder(),
+              //   ),
+              // ),
+              // const SizedBox(height: 20),
+              TextFormField(
+                controller: _agentNumberController,
+                decoration: const InputDecoration(
+                  labelText: "Agent Number",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
               // Description
               TextFormField(
                 controller: _descriptionController,
@@ -149,17 +171,17 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 child: _isLoading
                     ? const CircularProgressIndicator()
                     : ElevatedButton.icon(
-                  onPressed: _submitWithdraw,
-                  icon: const Icon(Icons.send),
-                  label: const Text("Submit"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                  ),
-                ),
+                        onPressed: _submitWithdraw,
+                        icon: const Icon(Icons.send),
+                        label: const Text("Submit"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),
