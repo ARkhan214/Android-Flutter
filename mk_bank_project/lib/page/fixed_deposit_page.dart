@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
 import '../service/fixed_deposit_service.dart';
-
 
 class FixedDepositPage extends StatefulWidget {
   const FixedDepositPage({super.key});
@@ -18,7 +19,16 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
   double? _maturityAmount;
   String _message = "";
 
+  late AccountService accountService;
+  late AccountsProfile accountsProfile;
+
   final List<int> monthsList = [12, 24, 36, 48, 60, 72, 84, 96, 108, 120];
+
+  @override
+  void initState() {
+    super.initState();
+    accountService = AccountService();
+  }
 
   void _calculatePreview() {
     double? amount = double.tryParse(_amountController.text);
@@ -28,9 +38,12 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
 
     double rate = 0;
     if (amount >= 100000) {
-      if (months >= 60) rate = 12;
-      else if (months >= 36) rate = 11;
-      else if (months >= 12) rate = 10;
+      if (months >= 60)
+        rate = 12;
+      else if (months >= 36)
+        rate = 11;
+      else if (months >= 12)
+        rate = 10;
     } else {
       if (months >= 12) rate = 7;
     }
@@ -70,11 +83,35 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsive layout
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 600;
+
     return Scaffold(
+      // appBar: AppBar(
+      //   title: const Text("Fixed Deposit"),
+      //   backgroundColor: Colors.green,
+      // ),
       appBar: AppBar(
-        title: const Text("Fixed Deposit"),
         backgroundColor: Colors.green,
+        title: const Text("Fixed Deposit"),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () async {
+            final profile = await accountService.getAccountsProfile();
+            if (profile != null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AccountsProfile(profile: profile),
+                ),
+              );
+            }
+          },
+        ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -95,7 +132,9 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
                 border: OutlineInputBorder(),
               ),
               items: monthsList
-                  .map((m) => DropdownMenuItem(value: m, child: Text("$m Months")))
+                  .map(
+                    (m) => DropdownMenuItem(value: m, child: Text("$m Months")),
+                  )
                   .toList(),
               value: _selectedMonths,
               onChanged: (val) {
@@ -109,7 +148,9 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
                 color: Colors.green.shade50,
                 child: ListTile(
                   title: Text("Interest Rate: $_estimatedInterestRate%"),
-                  subtitle: Text("Maturity Amount: ${_maturityAmount!.toStringAsFixed(2)} BDT"),
+                  subtitle: Text(
+                    "Maturity Amount: ${_maturityAmount!.toStringAsFixed(2)} BDT",
+                  ),
                 ),
               ),
             const SizedBox(height: 16),
@@ -117,7 +158,10 @@ class _FixedDepositPageState extends State<FixedDepositPage> {
               onPressed: _createFD,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 15,
+                ),
               ),
               child: const Text("Confirm FD", style: TextStyle(fontSize: 16)),
             ),
