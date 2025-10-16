@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
@@ -421,15 +422,15 @@ class AccountsProfile extends StatelessWidget {
           ),
           SizedBox(width: 8 * fontScale),
           Expanded(
-            child: _buildDashboardButton(context, "Education Fee",
+            child: _buildDashboardButton(context, "Fixed Deposit",
                 imageUrl:
-                "https://cdn-icons-png.flaticon.com/128/6926/6926264.png",
+                "https://cdn-icons-png.flaticon.com/128/5755/5755328.png",
                 color: Colors.blueGrey,
                 fontScale: fontScale,
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                    MaterialPageRoute(builder: (_) => const FixedDepositPage()),
                   );
                 }),
           ),
