@@ -1,9 +1,556 @@
-==============================================
-====================AccountsProfile  New==========================
-==============================================
+===============================Last=====
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+// *** Fix: Removed carousel_slider import entirely ***
+import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/withdraw_page.dart';
+import 'package:mk_bank_project/service/authservice.dart';
 
+// ----------------------------------------------------------------------
+// Custom Color Setup (Matching the bKash-like UI)
+// ----------------------------------------------------------------------
+
+// Primary Pink Color
+const Color kPrimaryPink = Color(0xFFE91E63);
+// Secondary Reddish/Orange Color
+const Color kSecondaryRed = Color(0xFFE8112D);
+// Yellow for offers/highlights
+const Color kAccentYellow = Color(0xFFF9B208);
+
+// ----------------------------------------------------------------------
+
+// Changed to StatefulWidget to manage balance visibility
+class AccountsProfile extends StatefulWidget {
+  final Map<String, dynamic> profile;
+
+  const AccountsProfile({super.key, required this.profile});
+
+  @override
+  State<AccountsProfile> createState() => _AccountsProfileState();
+}
+
+class _AccountsProfileState extends State<AccountsProfile> {
+  final AuthService _authService = AuthService();
+
+  // State to manage balance visibility
+  bool _showBalance = false;
+
+  // Image URLs for the Carousel (Now unused, but kept for future reference)
+  final List<String> carouselImageUrls = [
+    'https://picsum.photos/id/237/800/200',
+    'https://picsum.photos/id/10/800/200',
+    'https://picsum.photos/id/50/800/200',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    // Access profile using widget.profile
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontScale = screenWidth / 390; // responsive scaling
+
+    final String baseUrl = "http://localhost:8085/images/account/";
+    final String? photoName = widget.profile['photo'];
+    final String? photoUrl =
+    (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
+
+    final String balance = widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
+    final String maskedBalance = '৳ *****';
+    final String displayBalance = _showBalance ? '৳ $balance' : maskedBalance;
+
+    // Core logic for status (kept from your original code)
+    final bool isActive = widget.profile['accountActiveStatus'] == true;
+    final String statusText = isActive ? 'Active' : 'Inactive';
+    final Color statusColor = isActive ? Colors.green.shade600 : Colors.red.shade600;
+
+
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, true);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+
+        // ** The entire UI does not use a traditional AppBar, it uses the body. **
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Remove default back button
+          toolbarHeight: 0,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+
+        // ** Drawer Menu (Kept your original implementation) **
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: kPrimaryPink),
+                accountName: Text(
+                  widget.profile['name'] ?? 'Unknown User',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17 * fontScale,
+                  ),
+                ),
+                accountEmail: Text(
+                  widget.profile['user']?['email'] ?? 'N/A',
+                  style: TextStyle(fontSize: 14 * fontScale),
+                ),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 35,
+                    backgroundImage: (photoUrl != null)
+                        ? NetworkImage(photoUrl)
+                        : const AssetImage('assets/images/default_avatar.png')
+                    as ImageProvider,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person, color: kPrimaryPink),
+                title: Text(
+                  'View Profile',
+                  style: TextStyle(fontSize: 15 * fontScale),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout, color: kSecondaryRed),
+                title: Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: kSecondaryRed,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15 * fontScale,
+                  ),
+                ),
+                onTap: () async {
+                  await _authService.logout();
+                  // Note: Removed the unused 'accentColor' variable
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+
+        // ------------------ Body Section ------------------
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ** Top Header Section (Matching the Image) **
+              _buildTopHeader(context, photoUrl, fontScale),
+
+              // ** Dashboard Menu Icons **
+              _buildDashboardMenu(context, fontScale),
+
+              // ** See More Button **
+              _buildSeeMoreButton(fontScale),
+
+              const Divider(height: 1, thickness: 0.5, color: Colors.grey),
+
+              const SizedBox(height: 10),
+
+              // ** Carousel Slider Section (Now a Placeholder) **
+              _buildCarouselPlaceholder(fontScale),
+
+              const SizedBox(height: 20),
+
+              // ** Offer/Shortcut Section **
+              _buildOfferShortcutSection(fontScale),
+
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------ 4. Carousel Placeholder Section ------------------
+  // Replaced the buggy CarouselSlider with a simple ad banner
+  Widget _buildCarouselPlaceholder(double fontScale) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+      child: Container(
+        height: 120 * fontScale,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: kAccentYellow.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: kAccentYellow, width: 2),
+        ),
+        child: Text(
+          "অফার ব্যানার (Carousel Removed)", // Offer Banner
+          style: TextStyle(
+            fontSize: 16 * fontScale,
+            fontWeight: FontWeight.bold,
+            color: kAccentYellow,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------ 1. Top Header Section ------------------
+  Widget _buildTopHeader(BuildContext context, String? photoUrl, double fontScale) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, 20),
+      color: kPrimaryPink, // Pink background
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ** Profile Photo (Clickable for Drawer) **
+              GestureDetector(
+                onTap: () => Scaffold.of(context).openDrawer(),
+                child: CircleAvatar(
+                  radius: 25 * fontScale,
+                  backgroundColor: Colors.white,
+                  backgroundImage: (photoUrl != null)
+                      ? NetworkImage(photoUrl)
+                      : const AssetImage('assets/images/default_avatar.png')
+                  as ImageProvider,
+                ),
+              ),
+              // ** Top Right Icons **
+              Row(
+                children: [
+                  Icon(Icons.star_border, color: Colors.white, size: 24 * fontScale),
+                  SizedBox(width: 15),
+                  Icon(Icons.qr_code_scanner, color: Colors.white, size: 24 * fontScale),
+                  SizedBox(width: 5),
+                ],
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10),
+
+          // ** Name and Balance Section **
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ** User Name **
+              Text(
+                widget.profile['name'] ?? 'MK Bank User',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18 * fontScale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              // ** Notification Icon **
+              Icon(Icons.notifications_none, color: Colors.white, size: 24 * fontScale),
+            ],
+          ),
+
+          SizedBox(height: 10),
+
+          // ** Balance Section with Hide/Show Functionality **
+          GestureDetector(
+            onTap: () {
+              // Balance show/hide logic
+              setState(() {
+                _showBalance = !_showBalance;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _showBalance
+                        ? '৳ ${widget.profile['balance']?.toStringAsFixed(2) ?? '0.00'}'
+                        : '৳ *****',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16 * fontScale,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    "ব্যালেন্স দেখুন", // "View Balance" in Bangla
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14 * fontScale,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Icon(
+                    _showBalance ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.white,
+                    size: 18 * fontScale,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ 2. Dashboard Menu Icons ------------------
+  // 4x2 grid of buttons (matching the image)
+  Widget _buildDashboardMenu(BuildContext context, double fontScale) {
+    // List of menu items to generate the 4x2 grid
+    final List<Map<String, dynamic>> menuItems = [
+      {'title': 'Send Money', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
+      {'title': 'Mobile Recharge', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const TransferMoneyPage()},
+      {'title': 'Cash Out', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
+      {'title': 'Payment', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
+      {'title': 'Add Money', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
+      {'title': 'Pay Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WithdrawPage()},
+      {'title': 'Savings', 'icon': Icons.savings_outlined, 'color': Colors.pink, 'page': const WithdrawPage()},
+      {'title': 'Loan', 'icon': Icons.money_outlined, 'color': Colors.brown, 'page': const WithdrawPage()},
+    ];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 10 * fontScale),
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(), // Disable GridView scrolling
+        shrinkWrap: true,
+        itemCount: 8,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          childAspectRatio: 0.8, // Adjust ratio to fit title below icon
+          crossAxisSpacing: 5 * fontScale,
+          mainAxisSpacing: 10 * fontScale,
+        ),
+        itemBuilder: (context, index) {
+          final item = menuItems[index];
+          return _buildMenuItem(
+              context,
+              item['title'],
+              item['icon'],
+              item['color'],
+              fontScale,
+              item['page']
+          );
+        },
+      ),
+    );
+  }
+
+  // Helper Widget for a single Menu Item
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon, Color color, double fontScale, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(12 * fontScale),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 25 * fontScale, color: color),
+          ),
+          SizedBox(height: 5 * fontScale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12 * fontScale,
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ 3. See More Button ------------------
+  Widget _buildSeeMoreButton(double fontScale) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5 * fontScale),
+      child: TextButton.icon(
+        onPressed: () { /* Add your logic for 'See More' */ },
+        icon: Icon(Icons.keyboard_arrow_down, size: 20 * fontScale, color: kPrimaryPink),
+        label: Text(
+          "আরও দেখুন", // "See More" in Bangla
+          style: TextStyle(
+            color: kPrimaryPink,
+            fontWeight: FontWeight.bold,
+            fontSize: 14 * fontScale,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------ 5. Offer/Shortcut Section ------------------
+  Widget _buildOfferShortcutSection(double fontScale) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "আমার অফারস", // "My Offers" in Bangla
+                style: GoogleFonts.poppins(
+                  fontSize: 16 * fontScale,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.edit, size: 16 * fontScale, color: Colors.grey.shade600),
+                label: Text(
+                  "এডিট", // "Edit" in Bangla
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10 * fontScale),
+
+          // ** Horizontal List of Shortcuts (as seen in the image) **
+          SizedBox(
+            height: 110 * fontScale,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _buildShortcutCard("মাই অফারস\নদেখতে ট্যাপ করুন", Icons.card_giftcard, kPrimaryPink, fontScale),
+                SizedBox(width: 15 * fontScale),
+                _buildShortcutCard("NSI Ass. Direct...", Icons.access_time_filled, Colors.lightGreen, fontScale),
+                SizedBox(width: 15 * fontScale),
+                _buildShortcutCard("বিকাশ বান্ডেল", Icons.shopping_basket_outlined, Colors.purple, fontScale),
+                SizedBox(width: 15 * fontScale),
+                _buildShortcutCard("জিপি মাই অফার", Icons.local_offer_outlined, Colors.blue, fontScale),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper Widget for Shortcut Cards
+  Widget _buildShortcutCard(String title, IconData icon, Color iconColor, double fontScale) {
+    return Container(
+      width: 100 * fontScale,
+      padding: EdgeInsets.all(8 * fontScale),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Icon(icon, color: iconColor, size: 24 * fontScale),
+          ),
+          SizedBox(height: 10 * fontScale),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12 * fontScale,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------- Detail Tile (Kept as is) ----------------
+  Widget _buildDetailTile(
+      BuildContext context,
+      String label,
+      dynamic value,
+      double fontScale, {
+        bool isDate = false,
+      }) {
+    String displayValue = 'N/A';
+    if (value != null) {
+      displayValue =
+      isDate ? value.toString().substring(0, 10) : value.toString();
+    }
+
+    return Padding(
+      padding:
+      EdgeInsets.symmetric(horizontal: 14.0 * fontScale, vertical: 3.0 * fontScale),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "$label:",
+            style: TextStyle(
+              fontSize: 14 * fontScale,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Flexible(
+            child: Text(
+              displayValue,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 14 * fontScale,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+=========17/0/2025===========
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
@@ -425,15 +972,15 @@ class AccountsProfile extends StatelessWidget {
           ),
           SizedBox(width: 8 * fontScale),
           Expanded(
-            child: _buildDashboardButton(context, "Education Fee",
+            child: _buildDashboardButton(context, "Fixed Deposit",
                 imageUrl:
-                "https://cdn-icons-png.flaticon.com/128/6926/6926264.png",
+                "https://cdn-icons-png.flaticon.com/128/5755/5755328.png",
                 color: Colors.blueGrey,
                 fontScale: fontScale,
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const WithdrawPage()),
+                    MaterialPageRoute(builder: (_) => const FixedDepositPage()),
                   );
                 }),
           ),
@@ -534,718 +1081,6 @@ class AccountsProfile extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-
-======================================
-==============Account Profile OLD========================
-======================================
-import 'package:flutter/material.dart';
-import 'package:mk_bank_project/account/profile_page.dart';
-import 'package:mk_bank_project/page/loginpage.dart';
-import 'package:mk_bank_project/page/transfer_money_page.dart';
-import 'package:mk_bank_project/page/withdraw_page.dart';
-import 'package:mk_bank_project/service/authservice.dart';
-
-// ----------------------------------------------------------------------
-// Custom Color Setup
-// ----------------------------------------------------------------------
-
-const int _primaryValue = 0xFF004D40; // Dark Teal/Green
-
-const MaterialColor primaryColor = MaterialColor(_primaryValue, <int, Color>{
-  50: Color(0xFFE0F2F1),
-  100: Color(0xFFB2DFDB),
-  200: Color(0xFF80CBC4),
-  300: Color(0xFF4DB6AC),
-  400: Color(0xFF26A69A),
-  500: Color(_primaryValue),
-  600: Color(0xFF00897B),
-  700: Color(0xFF00796B),
-  800: Color(0xFF00695C),
-  900: Color(0xFF004D40),
-});
-
-const Color accentColor = Color(0xFFE57373); // Light Red/Coral
-
-// ----------------------------------------------------------------------
-
-class AccountsProfile extends StatelessWidget {
-  final Map<String, dynamic> profile;
-  final AuthService _authService = AuthService();
-
-  AccountsProfile({super.key, required this.profile});
-
-  @override
-  Widget build(BuildContext context) {
-    final String baseUrl = "http://localhost:8085/images/account/";
-    final String? photoName = profile['photo'];
-    final String? photoUrl = (photoName != null && photoName.isNotEmpty)
-        ? "$baseUrl$photoName"
-        : null;
-
-    final bool isActive = profile['accountActiveStatus'] == true;
-    final String statusText = isActive ? 'Active' : 'Inactive';
-    final Color statusColor = isActive
-        ? Colors.green.shade600
-        : Colors.red.shade600;
-
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, true);
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
-        appBar: AppBar(
-          title: const Text(
-            "MK Bank",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: primaryColor,
-          centerTitle: true,
-          elevation: 8,
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
-
-        // Drawer Menu
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: primaryColor.shade700),
-                accountName: Text(
-                  profile['name'] ?? 'Unknown User',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                accountEmail: Text(profile['user']?['email'] ?? 'N/A'),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 35,
-                    backgroundImage: (photoUrl != null)
-                        ? NetworkImage(photoUrl)
-                        : const AssetImage('assets/images/default_avatar.png')
-                              as ImageProvider,
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: Icon(Icons.person, color: primaryColor),
-                title: const Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 16),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfilePage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout, color: accentColor),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: accentColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () async {
-                  await _authService.logout();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => LoginPage()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-
-        // ------------------ Body Section ------------------
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Profile Card
-              Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 85,
-                            height: 85,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: primaryColor, width: 3),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ClipOval(
-                              child: CircleAvatar(
-                                backgroundImage: (photoUrl != null)
-                                    ? NetworkImage(photoUrl)
-                                    : const AssetImage(
-                                            'assets/images/default_avatar.png',
-                                          )
-                                          as ImageProvider,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  profile['name'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  "Account No: ${profile['id'] ?? 'N/A'}",
-                                  style: TextStyle(color: Colors.grey[700]),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: statusColor,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Status: $statusText",
-                                    style: TextStyle(
-                                      color: statusColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Text(
-                                "Balance",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "৳ ${profile['balance']?.toStringAsFixed(2) ?? 'N/A'}",
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      ExpansionTile(
-                        title: Text(
-                          "View Account Details",
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18,
-                          ),
-                        ),
-                        children: [
-                          _buildDetailTile(context, "NID", profile['nid']),
-                          _buildDetailTile(
-                            context,
-                            "Phone",
-                            profile['phoneNumber'],
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Address",
-                            profile['address'],
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Date of Birth",
-                            profile['dateOfBirth'],
-                            isDate: true,
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Opening Date",
-                            profile['accountOpeningDate'],
-                            isDate: true,
-                          ),
-                          _buildDetailTile(
-                            context,
-                            "Role",
-                            profile['role'] ?? 'User',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // ------------------ Dashboard Buttons ------------------
-              Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-
-                      // --------- 1st Row ----------
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Send Money",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/10614/10614665.png",
-                              color: Colors.brown,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const TransferMoneyPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Mobile Recharge",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/7732/7732360.png",
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const TransferMoneyPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Cash Out",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/8552/8552942.png",
-                              color: Colors.deepOrange,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // --------- 2nd Row ----------
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Transactions",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/16993/16993830.png",
-                              color: Colors.deepOrange,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Pay Bill",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/2058/2058414.png",
-                              color: Colors.black54,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Savings",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/12771/12771603.png",
-                              color: Colors.blueGrey,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // --------- 3rd Row ----------
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Loan",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/5571/5571405.png",
-                              color: Colors.green,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Education Fee",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/6926/6926264.png",
-                              color: Colors.blueGrey,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const WithdrawPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildDashboardButton(
-                              context,
-                              "Logout",
-                              imageUrl:
-                                  "https://cdn-icons-png.flaticon.com/128/1828/1828479.png",
-                              color: Colors.red,
-                              onPressed: () async {
-                                await _authService.logout();
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => LoginPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              //Dashbord Card End
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDashboardButton(
-    BuildContext context,
-    String title, {
-    IconData? icon,
-    String? imageUrl,
-    Color? color,
-    required VoidCallback onPressed,
-  }) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color ?? Theme.of(context).primaryColor,
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      onPressed: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (imageUrl != null)
-            Image.network(imageUrl, height: 28, width: 28, color: Colors.white)
-          else if (icon != null)
-            Icon(icon, size: 28, color: Colors.white),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, color: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-
-  //  Detail Tile Builder
-  Widget _buildDetailTile(
-    BuildContext context,
-    String label,
-    dynamic value, {
-    bool isDate = false,
-  }) {
-    String displayValue = 'N/A';
-    if (value != null) {
-      displayValue = isDate
-          ? value.toString().substring(0, 10)
-          : value.toString();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "$label:",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Flexible(
-            child: Text(
-              displayValue,
-              textAlign: TextAlign.right,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-
-======================
-===============profile page=======
-========================
-
-import 'package:flutter/material.dart';
-import 'package:mk_bank_project/entity/profile_model.dart';
-import '../service/authservice.dart';
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  final AuthService _authService = AuthService();
-  late Future<Profile> _profileFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _profileFuture = _authService.fetchUserProfile();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final String baseUrl = "http://localhost:8085/images/user/";
-
-    return Scaffold(
-      appBar: AppBar(title: const Text("My Profile")),
-      body: FutureBuilder<Profile>(
-        future: _profileFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No profile data found.'));
-          }
-
-          final profile = snapshot.data!;
-
-          // Photo URL logic
-          final String? photoName = profile.photo;
-          final String? photoUrl = (photoName != null && photoName.isNotEmpty)
-              ? "$baseUrl$photoName"
-              : null;
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: [
-                // Photo Part: Without proper circular & zoom
-
-                // Container(
-                //   decoration: BoxDecoration(
-                //     shape: BoxShape.circle,
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.black26,
-                //         blurRadius: 8,
-                //         offset: Offset(0, 4),
-                //       ),
-                //     ],
-                //     border: Border.all(color: Colors.purple, width: 3),
-                //   ),
-                //   child: CircleAvatar(
-                //     radius: 60,
-                //     backgroundColor: Colors.grey[200],
-                //     backgroundImage: (photoUrl != null)
-                //         ? NetworkImage(photoUrl)
-                //         : const AssetImage('assets/images/default_avatar.png')
-                //               as ImageProvider,
-                //   ),
-                // ),
-
-                // Fixed Photo Part: proper circular & zoom
-                Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.purple, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: (photoUrl != null)
-                          ? Image.network(
-                        photoUrl,
-                        fit: BoxFit.cover, // <-- fixes zoom
-                        width: 120,
-                        height: 120,
-                      )
-                          : Image.asset(
-                        'assets/images/default_avatar.png',
-                        fit: BoxFit.cover,
-                        width: 120,
-                        height: 120,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                Text(
-                  profile.name,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text("Email: ${profile.email}"),
-                Text("Phone: ${profile.phoneNumber}"),
-                Text("Role: ${profile.role}"),
-                Text("Active: ${profile.active}"),
-                Text("Enabled: ${profile.enabled}"),
-                Text("Date of Birth: ${profile.dateOfBirth.split("T")[0]}"),
-              ],
-            ),
-          );
-        },
       ),
     );
   }

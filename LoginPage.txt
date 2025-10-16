@@ -1,0 +1,1053 @@
+================Latest=======17/10/2025====From Gemini==============
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart'; // For using Google Fonts
+import 'package:mk_bank_project/admin/admin_profile_page.dart';
+import 'package:mk_bank_project/employee/employee_profile_page.dart';
+import 'package:mk_bank_project/page/registrationpage.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
+import 'package:mk_bank_project/service/admin_service.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/employee_service.dart';
+
+class LoginPage extends StatelessWidget {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
+  // ********** Core logic remains unchanged **********
+  final storage = const FlutterSecureStorage();
+  AuthService authService = AuthService();
+  AccountService accountService = AccountService();
+  EmployeeService employeeService = EmployeeService();
+  AdminService adminService = AdminService();
+
+  @override
+  Widget build(BuildContext context) {
+    // Set background color to white, similar to the image.
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 70),
+
+            // ** 1. Logo and Title Section (Matching the image) **
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  // A dummy logo or icon similar to the BRAC Bank logo
+                  Icon(
+                    Icons.account_balance_sharp,
+                    size: 60,
+                    color: Colors.blue.shade900, // Close to the deep blue color
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  // Displaying 'MK Bank'
+                  Text(
+                    "MK Bank",
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue.shade900,
+                    ),
+                  ),
+
+                  // 'Bank Smart' part from the image
+                  const Text(
+                    "Bank Smart",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+
+                  // vP7.9 part from the image
+                  const Text(
+                    "vP7.9",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // 'বাংলা' button on the top right
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.grey.shade100,
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          "বাংলা",
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // 'Login to BRAC Bank Astha' equivalent
+                  const Text(
+                    "Login to",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    "MK Bank Astha", // Using your MK Bank name
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFE8112D), // Reddish color from the image
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+
+            // ** 2. Login Input Section **
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Username Field Label
+                  const Text(
+                    "Username",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        fontSize: 16
+                    ),
+                  ),
+                  TextField(
+                    controller: email,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Username',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      isDense: true,
+                      // Underline border matching the image style
+                      border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey, width: 0.8),
+                      ),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey, width: 0.8),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue.shade700, width: 1.5),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Forgot Username?",
+                        style: TextStyle(
+                          color: Color(0xFFE8112D), // Reddish link color
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Password Field Label
+                  const Text(
+                    "Password",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        fontSize: 16
+                    ),
+                  ),
+                  TextField(
+                    controller: password,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Password',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      isDense: true,
+                      // Underline border matching the image style
+                      border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey, width: 0.8),
+                      ),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey, width: 0.8),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue.shade700, width: 1.5),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Color(0xFFE8112D), // Reddish link color
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // ** 3. Button Section **
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // REGISTER BIOMETRICS Button (Yellow)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFF9B208), // Yellow color from image
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            "REGISTER BIOMETRICS",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // LOGIN Button (Blue)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => loginUser(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade700, // Deep blue color from image
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            "LOGIN",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ** 4. The Three Bottom Action Cards Section **
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildBottomActionCard(Icons.person_add_alt_1, "Sign up for Astha", context),
+                  _buildBottomActionCard(Icons.account_balance_wallet_outlined, "Open a Bank Account", context),
+                  _buildBottomActionCard(Icons.credit_card, "Apply for Cards/Loans", context),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ** 5. The Bottom Yellow Menu Bar **
+            Container(
+              color: const Color(0xFFF9B208), // Yellow color from image
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildBottomMenu(Icons.location_on_outlined, "ATM/Branch\nNear Me"),
+                  _buildBottomMenu(Icons.local_offer_outlined, "Offers\nNear Me"),
+                  _buildBottomMenu(Icons.phone_in_talk_outlined, "Contact us"),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget for the bottom action cards (Sign up, Open Account, Apply for Loans)
+  Widget _buildBottomActionCard(IconData icon, String title, BuildContext context) {
+    // Light gray/white background and soft shadow, as seen in the image
+    return GestureDetector(
+      onTap: () {
+        // Navigation logic can be added here
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width / 3.8, // Sizing based on screen width
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            )
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 28, color: Colors.blue.shade700),
+            const SizedBox(height: 5),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 11, color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget for the bottom yellow menu bar items
+  Widget _buildBottomMenu(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white, size: 26),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              fontSize: 11, fontWeight: FontWeight.w500, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  // ********** Core Login Logic is kept exactly as you provided **********
+  Future<void> loginUser(BuildContext context) async {
+    try {
+      final response = await authService.login(email.text, password.text);
+      final role = await authService.getUserRole();
+
+      if (role == 'ADMIN') {
+        final adminProfile = await adminService.getAdminProfile();
+        if (adminProfile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AdminPage(profile: adminProfile)),
+          );
+        }
+      } else if (role == 'EMPLOYEE') {
+        final employeeProfile = await employeeService.getEmployeeProfile();
+        if (employeeProfile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EmployeePage(profile: employeeProfile)),
+          );
+        }
+      } else if (role == 'USER') {
+        final profile = await accountService.getAccountsProfile();
+        if (profile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccountsProfile(profile: profile)),
+          );
+        }
+      } else {
+        print('Unknown role: $role');
+      }
+    } catch (error) {
+      print('Login failed: $error');
+    }
+  }
+}
+============17/10/2025====New From ChatGPT========
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mk_bank_project/admin/admin_profile_page.dart';
+import 'package:mk_bank_project/employee/employee_profile_page.dart';
+import 'package:mk_bank_project/page/registrationpage.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
+import 'package:mk_bank_project/service/admin_service.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/employee_service.dart';
+
+class LoginPage extends StatelessWidget {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
+  final storage = const FlutterSecureStorage();
+  AuthService authService = AuthService();
+  AccountService accountService = AccountService();
+  EmployeeService employeeService = EmployeeService();
+  AdminService adminService = AdminService();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F8FB),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 70),
+
+            // Logo and Title Section
+            Column(
+              children: [
+                // Image.asset(
+                //   'assets/images/default_avater.png', // Replace with your own MK logo
+                //   height: 100,
+                // ),
+                Image.asset(
+                  'assets/images/login_logo.png',
+                  height: 120,
+                  width: 120,
+                  fit: BoxFit.contain,
+                ),
+
+                const SizedBox(height: 10),
+
+                // const Text(
+                //   "MK Bank Smart",
+                //   style: TextStyle(
+                //     fontSize: 22,
+                //     fontWeight: FontWeight.w500,
+                //     color: Colors.blueAccent,
+                //   ),
+                // ),
+
+                // App Title
+                Text(
+                  "Bank Smart",
+                  style: GoogleFonts.pacifico(
+                    fontSize: 24,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+                const Text(
+                  "vP7.9",
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const SizedBox(height: 20),
+
+                // Subtitle - Login
+                Text(
+                  "Login to",
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  "MK Bank",
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ],
+            ),
+
+            // Login Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18.0),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 5,
+                child: Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Username",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      TextField(
+                        controller: email,
+                        decoration: InputDecoration(
+                          hintText: 'Enter Username',
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          border: const UnderlineInputBorder(),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Forgot Username?",
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Password",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      TextField(
+                        controller: password,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: 'Enter Password',
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          border: const UnderlineInputBorder(),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF9B208),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: const Text(
+                                "REGISTER BIOMETRICS",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () => loginUser(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueAccent,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: const Text(
+                                "LOGIN",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // Bottom Buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 10,
+                children: [
+                  bottomCard(Icons.fingerprint, "Sign up for Astha"),
+                  bottomCard(Icons.account_balance, "Open a Bank Account"),
+                  bottomCard(Icons.credit_card, "Apply for Cards/Loans"),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // Bottom Menu
+            Container(
+              color: const Color(0xFFF9B208),
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  bottomMenu(Icons.location_on_outlined, "ATM/Branch\nNear Me"),
+                  bottomMenu(Icons.local_offer_outlined, "Offers\nNear Me"),
+                  bottomMenu(Icons.phone_in_talk_outlined, "Contact\nUs"),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget bottomCard(IconData icon, String title) {
+    return Container(
+      width: 105,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 5,
+            offset: const Offset(2, 2),
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: Colors.blueAccent),
+          const SizedBox(height: 5),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomMenu(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Future<void> loginUser(BuildContext context) async {
+    try {
+      final response = await authService.login(email.text, password.text);
+      final role = await authService.getUserRole();
+
+      if (role == 'ADMIN') {
+        final adminProfile = await adminService.getAdminProfile();
+        if (adminProfile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AdminPage(profile: adminProfile)),
+          );
+        }
+      } else if (role == 'EMPLOYEE') {
+        final employeeProfile = await employeeService.getEmployeeProfile();
+        if (employeeProfile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EmployeePage(profile: employeeProfile)),
+          );
+        }
+      } else if (role == 'USER') {
+        final profile = await accountService.getAccountsProfile();
+        if (profile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccountsProfile(profile: profile)),
+          );
+        }
+      } else {
+        print('Unknown role: $role');
+      }
+    } catch (error) {
+      print('Login failed: $error');
+    }
+  }
+}
+
+============17/10/2025====OLD========
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mk_bank_project/admin/admin_profile_page.dart';
+import 'package:mk_bank_project/employee/employee_profile_page.dart';
+import 'package:mk_bank_project/page/registrationpage.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
+import 'package:mk_bank_project/service/admin_service.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/employee_service.dart';
+
+class LoginPage extends StatelessWidget {
+  // =================Shortcut==========
+  // Line Alaignment = ctrl+alt+L
+  // Selection Duplicate = ctrl+D
+  // Select each next match = Alt + J
+  // All matches =  Ctrl + Alt + Shift + J
+  //========================================
+
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
+  final storage = new FlutterSecureStorage();
+  AuthService authService = AuthService();
+  AccountService accountService = AccountService();
+  EmployeeService employeeService = EmployeeService();
+  AdminService adminService = AdminService();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+      //Body Start====
+      // body: Padding(
+      //   padding: EdgeInsets.all(16.0),
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: [
+      //       TextField(
+      //         controller: email,
+      //         decoration: InputDecoration(
+      //           labelText: 'Email',
+      //           border: OutlineInputBorder(),
+      //           prefixIcon: Icon(Icons.email),
+      //         ),
+      //       ),
+      //
+      //       SizedBox(height: 20.0),
+      //
+      //       TextField(
+      //         controller: password,
+      //         obscureText: true,
+      //         decoration: InputDecoration(
+      //           labelText: 'Password',
+      //           border: OutlineInputBorder(),
+      //           prefixIcon: Icon(Icons.lock),
+      //         ),
+      //       ),
+      //
+      //       SizedBox(height: 20.0),
+      //
+      //       ElevatedButton(
+      //         onPressed: () {
+      //           loginUser(context);
+      //
+      //           // String em = email.text;
+      //           // String pass = password.text;
+      //           // print('Email: $em,Password: $pass');
+      //         },
+      //         child: Text(
+      //           "Login",
+      //           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+      //         ),
+      //
+      //         style: ElevatedButton.styleFrom(
+      //           backgroundColor: Colors.blue,
+      //           foregroundColor: Colors.white,
+      //         ),
+      //       ),
+      //
+      //       SizedBox(height: 20.0),
+      //
+      //       TextButton(
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(builder: (context) => Registration()),
+      //           );
+      //         },
+      //         child: Text(
+      //           "Registration here",
+      //           style: TextStyle(
+      //             color: Colors.green,
+      //             decoration: TextDecoration.none,
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+
+        backgroundColor: const Color(0xFFF3F6FA),
+        body: Center(
+            child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Logo or App Name
+                        Icon(
+                          Icons.account_balance,
+                          size: 70,
+                          color: Colors.blueAccent,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Welcome To MK Bank",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          "Login to your account",
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 15,
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        // Email
+                        TextField(
+                          controller: email,
+                          decoration: InputDecoration(
+                            labelText: 'Email Address',
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Password
+                        TextField(
+                          controller: password,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 25),
+
+                        // Login Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () => loginUser(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 3,
+                            ),
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Forgot Password
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Forgot Password?",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // Registration Redirect
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Don't have an account? ",
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Registration(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Register here",
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ),
+        ),
+
+
+
+      //Body End====
+
+
+
+    );
+  }
+
+  Future<void> loginUser(BuildContext context) async {
+    try {
+      final response = await authService.login(email.text, password.text);
+
+      final role = await authService.getUserRole();
+
+      if (role == 'ADMIN') {
+
+        final adminProfile = await adminService.getAdminProfile();
+
+        if(adminProfile != null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminPage(profile: adminProfile,)),
+          );
+        }
+
+      } else if (role == 'EMPLOYEE') {
+
+        final employeeProfile = await employeeService.getEmployeeProfile();
+
+
+        if(employeeProfile != null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => EmployeePage(profile: employeeProfile,)),
+          );
+        }
+
+      } else if (role == 'USER') {
+        final profile = await accountService.getAccountsProfile();
+        if (profile != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AccountsProfile(profile: profile),
+            ),
+          );
+        }
+      } else {
+        print('Unknown role: $role');
+      }
+    } catch (error) {
+      print('Login failed: $error');
+    }
+  }
+
+  //last
+}
