@@ -1,0 +1,29 @@
+
+class AccountsDTO {
+  final int? id; // nullable করে দিলাম
+  final String name;
+  final String accountType;
+  final String phoneNumber;
+  final String address;
+  final String? accountOpeningDate; // আপনার Angular মডেল অনুযায়ী String রাখলাম
+
+  AccountsDTO({
+    this.id,
+    required this.name,
+    required this.accountType,
+    required this.phoneNumber,
+    required this.address,
+    this.accountOpeningDate,
+  });
+
+  factory AccountsDTO.fromJson(Map<String, dynamic> json) {
+    return AccountsDTO(
+      id: json['id']?.toInt(),
+      name: json['name'] ?? 'N/A',
+      accountType: json['accountType'] ?? 'N/A',
+      phoneNumber: json['phoneNumber'] ?? 'N/A',
+      address: json['address'] ?? 'N/A',
+      accountOpeningDate: json['accountOpeningDate'], // আপনার API String দিচ্ছে
+    );
+  }
+}

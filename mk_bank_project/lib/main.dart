@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],
-      home: Registration(),
+      home: LoginPage(),
 
 
     );

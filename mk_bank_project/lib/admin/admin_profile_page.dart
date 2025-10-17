@@ -1,42 +1,12 @@
-//
-//
-//
-// import 'package:flutter/material.dart';
-// import 'package:mk_bank_project/service/admin_service.dart';
-// import 'package:mk_bank_project/service/authservice.dart';
-//
-// class AdminPage extends StatelessWidget {
-//   final Map<String, dynamic> profile;
-//
-//   final AuthService _authService = AuthService();
-//   final AdminService _adminService= AdminService();
-//
-//   AdminPage({super.key, required this.profile});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//
-//
-//     return Scaffold(
-//       body: Text('Admin Profile'),
-//     );
-//
-//
-//   }
-// }
-
-//==================================
-
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/service/admin_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-// Lottie এবং animations প্যাকেজ আপনার pubspec.yaml-এ আছে ধরে নিচ্ছি
 
 class AdminPage extends StatelessWidget {
-  // Login Page থেকে আসা প্রোফাইল ডেটা।
+  //Profile Data From Login Page
   final Map<String, dynamic> profile;
 
   final AuthService _authService = AuthService();
@@ -174,7 +144,7 @@ class AdminPage extends StatelessWidget {
 
       // --- AppBar (Header) ---
       appBar: AppBar(
-        title: Text('Admin Dashboard', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text('Admin Profile', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueAccent.shade700,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),

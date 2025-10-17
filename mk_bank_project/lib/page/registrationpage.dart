@@ -71,7 +71,6 @@ class _RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       //Body Part Start=========
       // body: Padding(
       //   padding: EdgeInsets.all(16.0),
@@ -305,8 +304,6 @@ class _RegistrationState extends State<Registration> {
       //     ),
       //   ),
       // ),
-
-
       body: Padding(
         padding: EdgeInsets.all(20.0), // Slightly increased padding
         child: SingleChildScrollView(
@@ -314,7 +311,8 @@ class _RegistrationState extends State<Registration> {
             key: _formkey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch, // Fields take up full width
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              // Fields take up full width
               children: [
                 // Design element: A stylish title
                 const Text(
@@ -334,10 +332,15 @@ class _RegistrationState extends State<Registration> {
                   decoration: InputDecoration(
                     labelText: "Full Name",
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                      borderRadius: BorderRadius.circular(
+                        10.0,
+                      ), // Rounded corners
                     ),
                     prefixIcon: Icon(Icons.person, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                 ),
 
@@ -351,8 +354,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.alternate_email, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.alternate_email,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                 ),
 
@@ -367,7 +376,10 @@ class _RegistrationState extends State<Registration> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     prefixIcon: Icon(Icons.lock, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   obscureText: true,
                 ),
@@ -383,7 +395,10 @@ class _RegistrationState extends State<Registration> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     prefixIcon: Icon(Icons.lock, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   obscureText: true,
                 ),
@@ -399,7 +414,10 @@ class _RegistrationState extends State<Registration> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     prefixIcon: Icon(Icons.phone, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                 ),
 
@@ -413,8 +431,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.maps_home_work_rounded, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.maps_home_work_rounded,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   maxLines: 2, // Increased line count for address
                 ),
@@ -428,8 +452,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   mode: DateTimeFieldPickerMode.date,
                   pickerPlatform: dob,
@@ -450,8 +480,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.credit_card, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.credit_card,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                 ),
 
@@ -463,10 +499,18 @@ class _RegistrationState extends State<Registration> {
                   decoration: InputDecoration(
                     labelText: "Account Type",
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0), // Consistent rounded corners
+                      borderRadius: BorderRadius.circular(
+                        10.0,
+                      ), // Consistent rounded corners
                     ),
-                    prefixIcon: const Icon(Icons.account_balance, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: const Icon(
+                      Icons.account_balance,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   items: accountTypes.map((type) {
                     return DropdownMenuItem(value: type, child: Text(type));
@@ -488,8 +532,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.attach_money, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.attach_money,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -503,8 +553,14 @@ class _RegistrationState extends State<Registration> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    prefixIcon: Icon(Icons.date_range, color: Color(0xFF1E88E5)),
-                    contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 15.0),
+                    prefixIcon: Icon(
+                      Icons.date_range,
+                      color: Color(0xFF1E88E5),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 18.0,
+                      horizontal: 15.0,
+                    ),
                   ),
                   mode: DateTimeFieldPickerMode.date,
                   pickerPlatform: accountOpeningDate,
@@ -530,7 +586,10 @@ class _RegistrationState extends State<Registration> {
                         icon: Icon(Icons.upload_file, color: Color(0xFF1E88E5)),
                         label: Text(
                           'Upload Profile Photo',
-                          style: TextStyle(color: Color(0xFF1E88E5), fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            color: Color(0xFF1E88E5),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         onPressed: pickImage,
                       ),
@@ -566,7 +625,8 @@ class _RegistrationState extends State<Registration> {
                   ),
                 ),
 
-                SizedBox(height: 30.0), // Extra space above the registration button
+                SizedBox(height: 30.0),
+                // Extra space above the registration button
 
                 // Registration Button
                 ElevatedButton(
@@ -574,9 +634,11 @@ class _RegistrationState extends State<Registration> {
                     _register();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1E88E5), // Primary action color
+                    backgroundColor: Color(0xFF1E88E5),
+                    // Primary action color
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16.0), // Increased button padding
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    // Increased button padding
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -591,6 +653,40 @@ class _RegistrationState extends State<Registration> {
                     ),
                   ),
                 ),
+
+                SizedBox(height: 20.0),
+                //For Back Screen
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.pop(context);
+                //   },
+                //   child: const Text('Go Back'),
+                // ),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  label: const Text(
+                    'Go Back',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                    shadowColor: Colors.greenAccent,
+                  ),
+                ),
+
 
                 SizedBox(height: 20.0),
 
@@ -616,7 +712,6 @@ class _RegistrationState extends State<Registration> {
           ),
         ),
       ),
-
 
       //Body Part End=========
     );

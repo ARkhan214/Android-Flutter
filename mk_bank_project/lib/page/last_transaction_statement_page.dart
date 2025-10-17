@@ -1,0 +1,340 @@
+import 'package:flutter/material.dart';
+// ✅ ফিক্স: TransactionModel এর বদলে DTO ব্যবহার করা হলো।
+import 'package:mk_bank_project/dto/transactiondto.dart';
+import 'package:mk_bank_project/dto/accountsdto.dart';
+// ✅ ফিক্স: প্রয়োজনীয় সার্ভিস এবং ইউটিলিটি ইম্পোর্ট করা হলো।
+import 'package:mk_bank_project/service/transaction_service.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/transaction_statement_service.dart';
+import 'package:mk_bank_project/service/transaction_totals.dart'; // ধরে নিলাম এই ফাইলটি আছে
+import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
+
+
+class LastTransactionStatementPage extends StatefulWidget {
+  const LastTransactionStatementPage({super.key});
+
+  @override
+  State<LastTransactionStatementPage> createState() => _LastTransactionStatementPageState();
+}
+
+class _LastTransactionStatementPageState extends State<LastTransactionStatementPage> {
+
+  // ✅ ফিক্স: সার্ভিস ক্লাস ইনিশিয়ালাইজেশন পুনরুদ্ধার করা হলো।
+  final TransactionStatementService _transactionService = TransactionStatementService(authService: AuthService());
+
+  // সব ট্রানজেকশন সংরক্ষণের জন্য ভেরিয়েবল
+  List<TransactionDTO> _fullStatement = [];
+
+  // লোডিং স্টেট এবং ডেটা হোল্ডার (শেষ ট্রানজেকশন)
+  TransactionDTO? _lastTransaction;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLastTransaction();
+  }
+
+  // --- 1. আসল API কল ফাংশন (সম্পূর্ণ স্টেটমেন্ট এনে শেষ ট্রানজেকশন সেট করা) ---
+  Future<void> _fetchLastTransaction() async {
+    try {
+      // ✅ ফিক্স: সার্ভিস থেকে সম্পূর্ণ স্টেটমেন্ট কল করা হলো।
+      final List<TransactionDTO> statement = await _transactionService.getStatement();
+
+      TransactionDTO? lastTx;
+      if (statement.isNotEmpty) {
+        // ফুল স্টেটমেন্ট সেভ করা
+        _fullStatement = statement;
+        // লিস্টের শেষ ট্রানজেকশনটি UI-এর জন্য নেওয়া
+        lastTx = statement.last;
+      }
+
+      if (mounted) {
+        setState(() {
+          // ✅ ফিক্স: _lastTransaction-এ ডেটা সেট করা হলো।
+          _lastTransaction = lastTx;
+          _isLoading = false;
+        });
+      }
+
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'লেনদেন লোড করতে সমস্যা: ${e.toString()}';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // --- 2. PDF এক্সপোর্ট ফাংশন (সম্পূর্ণ স্টেটমেন্টের জন্য) ---
+  void _exportPDF() async {
+    if (_fullStatement.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('কোনো লেনদেন নেই।')),
+      );
+      return;
+    }
+
+    try {
+      // সম্পূর্ণ লিস্টের জন্য টোটাল গণনা করা
+      double totalWithdraw = 0;
+      double totalDeposit = 0;
+      double currentBalance = _fullStatement.last.runningBalance ?? 0;
+
+      for (var tx in _fullStatement) {
+        if (tx.type == 'DEBIT') {
+          totalWithdraw += tx.amount ?? 0;
+        } else if (tx.type == 'CREDIT') {
+          totalDeposit += tx.amount ?? 0;
+        }
+      }
+
+      final totals = TransactionTotals(totalWithdraw, totalDeposit, currentBalance);
+
+      // পুরো লিস্ট PdfUtility-তে পাঠানো হলো
+      final pdfBytes = await PdfUtility.generateTransactionStatement(_fullStatement, totals);
+
+      // PDF শেয়ার বা ডাউনলোড করা
+      await Printing.sharePdf(
+          bytes: pdfBytes, filename: 'statement-${_fullStatement.first.account?.id ?? 'account'}.pdf');
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF তৈরি করতে সমস্যা: ${e.toString()}')),
+      );
+    }
+  }
+
+  // --- 3. UI বিল্ড ফাংশন (রেসপন্সিভ ডিজাইন) ---
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        body: Center(child: Text(_errorMessage!)),
+      );
+    }
+
+    if (_lastTransaction == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        body: const Center(child: Text('কোনো লেনদেন পাওয়া যায়নি।')),
+      );
+    }
+
+    // ট্রানজেকশনের ডেটা ব্যবহার করে UI তৈরি করা
+    final tx = _lastTransaction!;
+    final AccountsDTO? account = tx.account;
+
+    if (account == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        body: const Center(child: Text('অ্যাকাউন্টের তথ্য পাওয়া যায়নি।')),
+      );
+    }
+
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('শেষ লেনদেনের স্টেটমেন্ট'),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800), // রেসপন্সিভ maxWidth
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // --- Header ---
+                    const Text('MK Bank PLC.', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.indigo)),
+                    const Divider(thickness: 2),
+
+                    // --- Customer Details ---
+                    const SizedBox(height: 10),
+                    const Text('গ্রাহকের তথ্য', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+                    const SizedBox(height: 10),
+
+                    _buildCustomerDetails(account),
+
+                    const Divider(height: 30),
+
+                    // --- Transaction Details ---
+                    const Text('লেনদেনের বিবরণ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+                    const SizedBox(height: 10),
+
+                    // এখানে শুধু শেষ ট্রানজেকশনটি দেখানো হচ্ছে
+                    _buildTransactionTable(tx),
+
+                    const SizedBox(height: 20),
+
+                    // --- Save PDF Button ---
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: _exportPDF,
+                        icon: const Icon(Icons.picture_as_pdf),
+                        label: const Text('স্টেটমেন্ট সেভ করুন (PDF)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+                    const Center(
+                      child: Text(
+                        "এই চালানটি MK Bank iBanking সিস্টেম থেকে তৈরি করা হয়েছে। স্বাক্ষরের প্রয়োজন নেই।",
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Customer Details Helper ---
+  Widget _buildCustomerDetails(AccountsDTO account) {
+    return Wrap(
+      spacing: 40.0,
+      runSpacing: 10.0,
+      children: [
+        _infoRow('Customer ID:', (account.id ?? 'N/A').toString()),
+        _infoRow('Name:', account.name ?? 'N/A'),
+        _infoRow('Address:', account.address ?? 'N/A'),
+        _infoRow('Account Type:', account.accountType ?? 'N/A'),
+        _infoRow('Phone:', account.phoneNumber ?? 'N/A'),
+        _infoRow(
+          'Opening Date:',
+          account.accountOpeningDate != null
+              ? DateFormat('dd MMM yyyy').format(DateTime.parse(account.accountOpeningDate!))
+              : 'N/A',
+        ),
+      ],
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return SizedBox(
+      width: 300,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(value, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Transaction Table Helper ---
+  Widget _buildTransactionTable(TransactionDTO tx) {
+    final bool isDebit = tx.type == 'DEBIT';
+    final amountText = tx.amount != null ? NumberFormat('###,##0.00').format(tx.amount!) : '0.00';
+    final balanceText = tx.runningBalance != null ? NumberFormat('###,##0.00').format(tx.runningBalance!) : '0.00';
+
+    // সিঙ্গেল ট্রানজেকশনের জন্য টেবিল
+    return Table(
+      border: TableBorder.all(color: Colors.grey.shade300),
+      columnWidths: const {
+        0: FlexColumnWidth(1.5),
+        1: FlexColumnWidth(2.5),
+        2: FlexColumnWidth(2.0),
+        3: FlexColumnWidth(2.0),
+        4: FlexColumnWidth(2.0),
+        5: FlexColumnWidth(2.0),
+      },
+      children: [
+        // Header Row
+        const TableRow(
+          decoration: BoxDecoration(color: Colors.indigo),
+          children: [
+            _TableHeaderCell(text: 'তারিখ', color: Colors.white),
+            _TableHeaderCell(text: 'বিবরণ', color: Colors.white),
+            _TableHeaderCell(text: 'Withdraw (টাকা)', color: Colors.white),
+            _TableHeaderCell(text: 'Deposit (টাকা)', color: Colors.white),
+            _TableHeaderCell(text: 'ধরন', color: Colors.white),
+            _TableHeaderCell(text: 'ব্যালেন্স (টাকা)', color: Colors.white),
+          ],
+        ),
+        // Data Row
+        TableRow(
+          children: [
+            _TableDataCell(tx.transactionTime != null ? DateFormat('dd MMM yy, hh:mm a').format(DateTime.parse(tx.transactionTime!)) : 'N/A'),
+            _TableDataCell(tx.description ?? 'N/A'),
+            _TableDataCell(isDebit ? amountText : ''),
+            _TableDataCell(!isDebit ? amountText : ''),
+            _TableDataCell(tx.transactionType ?? 'N/A'),
+            _TableDataCell(balanceText, isNumeric: true, textColor: Colors.blue.shade900),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// --- কাস্টম টেবিল সেল উইজেট ---
+class _TableHeaderCell extends StatelessWidget {
+  final String text;
+  final Color color;
+  const _TableHeaderCell({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: color),
+      ),
+    );
+  }
+}
+
+class _TableDataCell extends StatelessWidget {
+  final String text;
+  final bool isNumeric;
+  final Color? textColor;
+  const _TableDataCell(this.text, {this.isNumeric = false, this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        textAlign: isNumeric ? TextAlign.right : TextAlign.left,
+        style: TextStyle(fontSize: 12, color: textColor),
+      ),
+    );
+  }
+}

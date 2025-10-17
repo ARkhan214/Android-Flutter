@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
@@ -53,6 +56,14 @@ class _AccountsProfileState extends State<AccountsProfile> {
     {'title': 'সেন্ড মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
     {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const TransferMoneyPage()},
     {'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
+
+    // ** Fixed Deposit এবং DPS যোগ করা হলো **
+    {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
+    {'title': 'ভিউ ফিক্সড ডিপোজিট', 'icon': Icons.view_agenda_outlined, 'color': Colors.brown, 'page': const ViewFixedDepositPage()}, // Fixed Deposit
+    {'title': 'ডিপিএস', 'icon': Icons.auto_delete_outlined, 'color': Colors.indigo, 'page': const WithdrawPage()}, // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
+    {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
+    {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
+
     {'title': 'পেমেন্ট', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
     {'title': 'অ্যাড মানি', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
     {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WithdrawPage()},
@@ -65,9 +76,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
     {'title': 'মাইক্রোফাইন্যান্স', 'icon': Icons.paid_outlined, 'color': Colors.deepPurple, 'page': const WithdrawPage()},
     // You can add more items if needed for the third row, but we'll stick to 12 for 3 rows of 4
 
-    // ** Fixed Deposit এবং DPS যোগ করা হলো **
-    {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
-    {'title': 'ডিপিএস', 'icon': Icons.auto_delete_outlined, 'color': Colors.indigo, 'page': const WithdrawPage()}, // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
+
   ];
 
   @override

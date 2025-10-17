@@ -160,106 +160,6 @@ class _WithdrawPageState extends State<WithdrawPage> {
         ],
       ),
 
-      //==========
-
-      // appBar: AppBar(
-      //   title: const Text("💸 Cash Out"),
-      //   leading: IconButton(
-      //     icon: Icon(Icons.arrow_back_ios),
-      //     onPressed: () async {
-      //       final profile = await accountService.getAccountsProfile();
-      //
-      //       if (profile != null) {
-      //         Navigator.pushReplacement(
-      //           context,
-      //           MaterialPageRoute(
-      //             builder: (context) => AccountsProfile(profile: profile),
-      //           ),
-      //         );
-      //       }
-      //     },
-      //   ),
-      // ),
-      //===========================
-
-      // body: Padding(
-      //   padding: const EdgeInsets.all(16.0),
-      //   child: Form(
-      //     key: _formKey,
-      //     child: Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //         // Amount
-      //         TextFormField(
-      //           controller: _amountController,
-      //           keyboardType: TextInputType.number,
-      //           decoration: const InputDecoration(
-      //             labelText: "Amount",
-      //             border: OutlineInputBorder(),
-      //           ),
-      //           validator: (value) {
-      //             if (value == null || value.isEmpty) {
-      //               return "Please enter amount";
-      //             }
-      //             if (double.tryParse(value)! <= 0) {
-      //               return "Amount must be greater than 0";
-      //             }
-      //             return null;
-      //           },
-      //         ),
-      //         const SizedBox(height: 20),
-      //
-      //         // 🔹 Fake Agent Number Field (UI Only)
-      //         // TextFormField(
-      //         //   enabled: true, // backend বা user input নিষ্ক্রিয় রাখবে
-      //         //   initialValue: "017XXXXXXXX", // এখানে যা খুশি demo value দিতে পারো
-      //         //   decoration: const InputDecoration(
-      //         //     labelText: "Agent Number",
-      //         //     border: OutlineInputBorder(),
-      //         //   ),
-      //         // ),
-      //         // const SizedBox(height: 20),
-      //         TextFormField(
-      //           controller: _agentNumberController,
-      //           decoration: const InputDecoration(
-      //             labelText: "Agent Number",
-      //             border: OutlineInputBorder(),
-      //           ),
-      //         ),
-      //         const SizedBox(height: 20),
-      //
-      //         // Description
-      //         TextFormField(
-      //           controller: _descriptionController,
-      //           maxLines: 3,
-      //           decoration: const InputDecoration(
-      //             labelText: "Description (Optional)",
-      //             border: OutlineInputBorder(),
-      //           ),
-      //         ),
-      //         const SizedBox(height: 30),
-      //
-      //         // Buttons
-      //         Center(
-      //           child: _isLoading
-      //               ? const CircularProgressIndicator()
-      //               : ElevatedButton.icon(
-      //                   onPressed: _submitWithdraw,
-      //                   icon: const Icon(Icons.send),
-      //                   label: const Text("Submit"),
-      //                   style: ElevatedButton.styleFrom(
-      //                     backgroundColor: Colors.green,
-      //                     padding: const EdgeInsets.symmetric(
-      //                       horizontal: 32,
-      //                       vertical: 16,
-      //                     ),
-      //                   ),
-      //                 ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
       //==========================
       body: Container(
         // Custom Background (Very light green/white gradient)
@@ -288,7 +188,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     children: [
                       // --- Form Title (Unique Font) ---
                       Text(
-                        'Confirm Withdrawal',
+                        'Confirm Cashout',
                         style: GoogleFonts.zillaSlab( // Unique Slab Serif Font
                           fontSize: 30,
                           fontWeight: FontWeight.w700,
@@ -411,7 +311,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           onPressed: _submitWithdraw,
                           icon: const Icon(Icons.send_rounded, size: 24),
                           label: Text(
-                            "Submit Withdrawal",
+                            "Submit",
                             style: GoogleFonts.openSans(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
