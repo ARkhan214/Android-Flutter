@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-// ✅ ফিক্স: TransactionModel এর বদলে DTO ব্যবহার করা হলো।
+// ✅ Fikks: Used DTO instead of TransactionModel.
 import 'package:mk_bank_project/dto/transactiondto.dart';
 import 'package:mk_bank_project/dto/accountsdto.dart';
-// ✅ ফিক্স: প্রয়োজনীয় সার্ভিস এবং ইউটিলিটি ইম্পোর্ট করা হলো।
+// ✅ Fikks: Imported necessary services and utilities.
 import 'package:mk_bank_project/service/transaction_service.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 import 'package:mk_bank_project/service/transaction_statement_service.dart';
@@ -20,41 +20,74 @@ class LastTransactionStatementPage extends StatefulWidget {
 
 class _LastTransactionStatementPageState extends State<LastTransactionStatementPage> {
 
-  // ✅ ফিক্স: সার্ভিস ক্লাস ইনিশিয়ালাইজেশন পুনরুদ্ধার করা হলো।
+  // ✅ Fix: Service class initialization restored.
   final TransactionStatementService _transactionService = TransactionStatementService(authService: AuthService());
 
-  // সব ট্রানজেকশন সংরক্ষণের জন্য ভেরিয়েবল
+  // Variable to hold all transactions (sorted and with running balance)
   List<TransactionDTO> _fullStatement = [];
 
-  // লোডিং স্টেট এবং ডেটা হোল্ডার (শেষ ট্রানজেকশন)
-  TransactionDTO? _lastTransaction;
+  // Index to track the currently displayed transaction in _fullStatement
+  int _currentIndex = -1; // -1 means no transaction loaded yet
+
+  // Data holder for the currently displayed transaction
+  TransactionDTO? _currentTransaction; // Changed from _lastTransaction
+
+  // Loading state and error message
   bool _isLoading = true;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _fetchLastTransaction();
+    _fetchTransactionsAndSetLast();
   }
 
-  // --- 1. আসল API কল ফাংশন (সম্পূর্ণ স্টেটমেন্ট এনে শেষ ট্রানজেকশন সেট করা) ---
-  Future<void> _fetchLastTransaction() async {
+  // --- Helper function to calculate the running balance for the entire statement ---
+  void _computeRunningBalances() {
+    if (_fullStatement.isEmpty) return;
+
+    // 1. Sort transactions by time to ensure correct running balance calculation.
+    _fullStatement.sort((a, b) => DateTime.parse(a.transactionTime!).compareTo(DateTime.parse(b.transactionTime!)));
+
+    double runningBalance = 0;
+
+    for (int i = 0; i < _fullStatement.length; i++) {
+      TransactionDTO tx = _fullStatement[i];
+      final amount = tx.amount ?? 0;
+
+      if (tx.type == 'DEBIT') {
+        runningBalance -= amount;
+      } else if (tx.type == 'CREDIT') {
+        runningBalance += amount;
+      }
+
+      // 2. Update the DTO in the list with the calculated running balance using copyWith
+      _fullStatement[i] = tx.copyWith(runningBalance: runningBalance);
+    }
+  }
+
+
+  // --- 1. The main API call function (fetches the full statement and sets the last transaction) ---
+  Future<void> _fetchTransactionsAndSetLast() async {
     try {
-      // ✅ ফিক্স: সার্ভিস থেকে সম্পূর্ণ স্টেটমেন্ট কল করা হলো।
+      // Fetch the complete statement from the service.
       final List<TransactionDTO> statement = await _transactionService.getStatement();
 
-      TransactionDTO? lastTx;
       if (statement.isNotEmpty) {
-        // ফুল স্টেটমেন্ট সেভ করা
+        // Save the full statement
         _fullStatement = statement;
-        // লিস্টের শেষ ট্রানজেকশনটি UI-এর জন্য নেওয়া
-        lastTx = statement.last;
+
+        // Calculate running balance for all transactions
+        _computeRunningBalances();
+
+        // Set the current index to the last transaction (latest)
+        _currentIndex = _fullStatement.length - 1;
+        // Set the currently displayed transaction for the UI
+        _currentTransaction = _fullStatement[_currentIndex];
       }
 
       if (mounted) {
         setState(() {
-          // ✅ ফিক্স: _lastTransaction-এ ডেটা সেট করা হলো।
-          _lastTransaction = lastTx;
           _isLoading = false;
         });
       }
@@ -69,9 +102,31 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
     }
   }
 
-  // --- 2. PDF এক্সপোর্ট ফাংশন (সম্পূর্ণ স্টেটমেন্টের জন্য) ---
+  // --- NEW: Function to navigate to the previous transaction (older) ---
+  void _goToPreviousTransaction() {
+    if (_currentIndex > 0) {
+      setState(() {
+        _currentIndex--;
+        _currentTransaction = _fullStatement[_currentIndex];
+      });
+    }
+  }
+
+  // --- NEW: Function to navigate to the next transaction (more recent) ---
+  void _goToNextTransaction() {
+    // Check if there are more recent transactions to view
+    if (_currentIndex < _fullStatement.length - 1) {
+      setState(() {
+        _currentIndex++;
+        _currentTransaction = _fullStatement[_currentIndex];
+      });
+    }
+  }
+
+
+  // --- 2. PDF Export Function (for the currently displayed transaction ONLY) ---
   void _exportPDF() async {
-    if (_fullStatement.isEmpty) {
+    if (_currentTransaction == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('কোনো লেনদেন নেই।')),
       );
@@ -79,27 +134,24 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
     }
 
     try {
-      // সম্পূর্ণ লিস্টের জন্য টোটাল গণনা করা
-      double totalWithdraw = 0;
-      double totalDeposit = 0;
-      double currentBalance = _fullStatement.last.runningBalance ?? 0;
+      // Only the currently displayed transaction is needed for the PDF
+      final List<TransactionDTO> transactionForPdf = [_currentTransaction!];
 
-      for (var tx in _fullStatement) {
-        if (tx.type == 'DEBIT') {
-          totalWithdraw += tx.amount ?? 0;
-        } else if (tx.type == 'CREDIT') {
-          totalDeposit += tx.amount ?? 0;
-        }
-      }
+      // Calculate totals for the single transaction (just for consistency, although only balance matters)
+      double totalWithdraw = _currentTransaction!.type == 'DEBIT' ? (_currentTransaction!.amount ?? 0) : 0;
+      double totalDeposit = _currentTransaction!.type == 'CREDIT' ? (_currentTransaction!.amount ?? 0) : 0;
+      double currentBalance = _currentTransaction!.runningBalance ?? 0;
 
       final totals = TransactionTotals(totalWithdraw, totalDeposit, currentBalance);
 
-      // পুরো লিস্ট PdfUtility-তে পাঠানো হলো
-      final pdfBytes = await PdfUtility.generateTransactionStatement(_fullStatement, totals);
+      // Send the single transaction list to PdfUtility
+      // Note: PdfUtility class is assumed to be available and correctly implemented elsewhere
+      final pdfBytes = await PdfUtility.generateTransactionStatement(transactionForPdf, totals);
 
-      // PDF শেয়ার বা ডাউনলোড করা
+      // Share or download the PDF
+      final date = DateFormat('ddMMyy').format(DateTime.parse(_currentTransaction!.transactionTime!));
       await Printing.sharePdf(
-          bytes: pdfBytes, filename: 'statement-${_fullStatement.first.account?.id ?? 'account'}.pdf');
+          bytes: pdfBytes, filename: 'transaction_${date}_${_currentTransaction!.id}.pdf');
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -108,38 +160,38 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
     }
   }
 
-  // --- 3. UI বিল্ড ফাংশন (রেসপন্সিভ ডিজাইন) ---
+  // --- 3. UI Build Function (Responsive Design) ---
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        appBar: AppBar(title: const Text('লেনদেনের স্টেটমেন্ট')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        appBar: AppBar(title: const Text('লেনদেনের স্টেটমেন্ট')),
         body: Center(child: Text(_errorMessage!)),
       );
     }
 
-    if (_lastTransaction == null) {
+    if (_currentTransaction == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        appBar: AppBar(title: const Text('লেনদেনের স্টেটমেন্ট')),
         body: const Center(child: Text('কোনো লেনদেন পাওয়া যায়নি।')),
       );
     }
 
-    // ট্রানজেকশনের ডেটা ব্যবহার করে UI তৈরি করা
-    final tx = _lastTransaction!;
+    // Use transaction data to build the UI
+    final tx = _currentTransaction!;
     final AccountsDTO? account = tx.account;
 
     if (account == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('শেষ লেনদেন')),
+        appBar: AppBar(title: const Text('লেনদেনের স্টেটমেন্ট')),
         body: const Center(child: Text('অ্যাকাউন্টের তথ্য পাওয়া যায়নি।')),
       );
     }
@@ -147,14 +199,15 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('শেষ লেনদেনের স্টেটমেন্ট'),
+        // Show current index and total transactions
+        title: Text('লেনদেন: ${_currentIndex + 1} of ${_fullStatement.length}'),
         backgroundColor: Colors.deepOrange,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800), // রেসপন্সিভ maxWidth
+            constraints: const BoxConstraints(maxWidth: 800), // Responsive maxWidth
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -180,24 +233,53 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
                     const Text('লেনদেনের বিবরণ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
                     const SizedBox(height: 10),
 
-                    // এখানে শুধু শেষ ট্রানজেকশনটি দেখানো হচ্ছে
+                    // The table shows the current transaction
                     _buildTransactionTable(tx),
 
                     const SizedBox(height: 20),
 
-                    // --- Save PDF Button ---
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: _exportPDF,
-                        icon: const Icon(Icons.picture_as_pdf),
-                        label: const Text('স্টেটমেন্ট সেভ করুন (PDF)'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          textStyle: const TextStyle(fontSize: 16),
+                    // --- Navigation and Save PDF Buttons (Responsive using Wrap) ---
+                    Wrap(
+                      spacing: 15.0, // Space between buttons
+                      runSpacing: 10.0, // Space between lines if wrapped
+                      alignment: WrapAlignment.center, // Center the buttons
+                      children: [
+                        // Previous Button
+                        ElevatedButton.icon(
+                          onPressed: _currentIndex > 0 ? _goToPreviousTransaction : null, // Disable if at the first transaction
+                          icon: const Icon(Icons.arrow_back, size: 18),
+                          label: const Text('পূর্ববর্তী লেনদেন', style: TextStyle(fontSize: 14)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                          ),
                         ),
-                      ),
+
+                        // Next Button (NEW)
+                        ElevatedButton.icon(
+                          onPressed: _currentIndex < _fullStatement.length - 1 ? _goToNextTransaction : null, // Disable if at the last transaction
+                          icon: const Icon(Icons.arrow_forward, size: 18),
+                          label: const Text('পরবর্তী লেনদেন', style: TextStyle(fontSize: 14)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                          ),
+                        ),
+
+                        // Save PDF Button
+                        ElevatedButton.icon(
+                          onPressed: _exportPDF,
+                          icon: const Icon(Icons.picture_as_pdf, size: 18),
+                          label: const Text('স্টেটমেন্ট সেভ করুন (PDF)', style: TextStyle(fontSize: 14)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 10),
@@ -218,7 +300,7 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
     );
   }
 
-  // --- Customer Details Helper ---
+  // --- Customer Details Helper (No changes) ---
   Widget _buildCustomerDetails(AccountsDTO account) {
     return Wrap(
       spacing: 40.0,
@@ -255,7 +337,7 @@ class _LastTransactionStatementPageState extends State<LastTransactionStatementP
     );
   }
 
-  // --- Transaction Table Helper ---
+  // --- Transaction Table Helper (No changes) ---
   Widget _buildTransactionTable(TransactionDTO tx) {
     final bool isDebit = tx.type == 'DEBIT';
     final amountText = tx.amount != null ? NumberFormat('###,##0.00').format(tx.amount!) : '0.00';
