@@ -190,7 +190,10 @@ class _ViewFixedDepositPageState extends State<ViewFixedDepositPage> {
                     crossAxisSpacing: 12.0,
                     mainAxisSpacing: 12.0,
                     // Adjusted childAspectRatio for smaller, wider cards, suitable for responsiveness
-                    childAspectRatio: crossAxisCount == 1 ? 4.5 / 3.0 : 3.0 / 2.5,
+                    //childAspectRatio: crossAxisCount == 1 ? 4.5 / 3.0 : 3.0 / 2.5,
+                   // childAspectRatio: crossAxisCount == 1 ? 4.5 / 3.8 : 3.0 / 2.8,
+
+
                   ),
                   itemCount: fds.length,
                   itemBuilder: (context, index) {
@@ -233,68 +236,77 @@ class _ViewFixedDepositPageState extends State<ViewFixedDepositPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: const Border(left: BorderSide(color: Colors.blue, width: 5)),
-          color: const Color(0xfff8f9fa),
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive Title Size
-            Text(
-              'FD #${fd.id}',
-              style: TextStyle(
-                  fontSize: isSingleColumn ? 20 : 18, // Slightly larger on mobile
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
-            ),
-            const Divider(height: 10, thickness: 1),
 
-            // Details are now wrapped in a flexible column/row structure if needed,
-            // but _buildDetailRow already uses Expanded which helps responsiveness.
 
-            _buildDetailRow(
-                'Deposit Amount:', currencyFormatter.format(fd.depositAmount),
-                Colors.green),
-            _buildDetailRow('Duration:', '${fd.durationInMonths} months',
-                Colors.indigo),
-            _buildDetailRow('Interest Rate:', '${fd.interestRate}%',
-                Colors.orange),
-            _buildDetailRow('Maturity Amount:',
-                currencyFormatter.format(fd.maturityAmount), Colors.green),
-            _buildDetailRow('Status:', fd.status, statusColor),
-            _buildDetailRow('Start Date:', formatter.format(fd.startDate),
-                Colors.black54),
-            _buildDetailRow('Maturity Date:', formatter.format(fd.maturityDate),
-                Colors.black54),
-
-            // Flexible spacing before button
-            const Spacer(),
-
-            // Close Button Logic
-            if (fd.status == 'ACTIVE' && fd.accountId != null)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => _confirmClose(fd.id, fd.accountId),
-                  icon: const Icon(Icons.close, size: 18),
-                  label: const Text('Close FD'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: const Border(left: BorderSide(color: Colors.blue, width: 5)),
+            color: const Color(0xfff8f9fa),
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Responsive Title Size
+              Text(
+                'FD #${fd.id}',
+                style: TextStyle(
+                    fontSize: isSingleColumn ? 20 : 18, // Slightly larger on mobile
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
               ),
-          ],
+              const Divider(height: 10, thickness: 1),
+
+              // Details are now wrapped in a flexible column/row structure if needed,
+              // but _buildDetailRow already uses Expanded which helps responsiveness.
+
+              _buildDetailRow(
+                  'Deposit Amount:', currencyFormatter.format(fd.depositAmount),
+                  Colors.green),
+              _buildDetailRow('Duration:', '${fd.durationInMonths} months',
+                  Colors.indigo),
+              _buildDetailRow('Interest Rate:', '${fd.interestRate}%',
+                  Colors.orange),
+              _buildDetailRow('Maturity Amount:',
+                  currencyFormatter.format(fd.maturityAmount), Colors.green),
+              _buildDetailRow('Status:', fd.status, statusColor),
+              _buildDetailRow('Start Date:', formatter.format(fd.startDate),
+                  Colors.black54),
+              _buildDetailRow('Maturity Date:', formatter.format(fd.maturityDate),
+                  Colors.black54),
+
+              // Flexible spacing before button
+              // const Spacer(),
+                SizedBox(height: 10,),
+              // Close Button Logic
+              if (fd.status == 'ACTIVE' && fd.accountId != null)
+                SizedBox(
+                  width: double.infinity,
+
+                  child: ElevatedButton.icon(
+                    onPressed: () => _confirmClose(fd.id, fd.accountId),
+                    icon: const Icon(Icons.close, size: 18),
+                    label: const Text('Close FD'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+
+
+                ),
+            ],
+          ),
         ),
-      ),
+
+
+
+
     );
   }
 
