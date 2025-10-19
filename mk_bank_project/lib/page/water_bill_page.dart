@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
 import 'package:mk_bank_project/entity/transaction_model.dart';
+import 'package:mk_bank_project/service/account_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -21,6 +23,8 @@ class _WaterBillPageState extends State<WaterBillPage> {
   // TextEditingController এবং ভ্যালু
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _billingIdController = TextEditingController();
+
+  late AccountService accountService;
   String? _selectedCompany;
   String _token = '';
 
@@ -41,6 +45,7 @@ class _WaterBillPageState extends State<WaterBillPage> {
   void initState() {
     super.initState();
     _loadInitialData();
+    accountService = AccountService();
   }
 
   @override
@@ -119,7 +124,7 @@ class _WaterBillPageState extends State<WaterBillPage> {
 
       // router.navigate(['/invoice']) এর সমতুল্য
       // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (context) => const InvoicePage()),
+      //   MaterialPageRoute(builder: (context) => const AccountsProfile()),
       // );
 
     } catch (err) {
@@ -159,10 +164,35 @@ class _WaterBillPageState extends State<WaterBillPage> {
   Widget build(BuildContext context) {
     // Angular-এর max-width: 720px এবং shadow-lg এর জন্য
     return Scaffold(
+
       appBar: AppBar(
         title: const Text('💧 Water Bill Payment'),
         backgroundColor: primaryColor,
+
+        centerTitle: true,
+
+        leading: Padding(padding: const EdgeInsets.only(left: 10.0),
+          child: IconButton(
+            icon:  const Icon(Icons.arrow_back_rounded, // A softer, modern back icon
+                color: Color(0xFFFD8E3D)), // Orange accent color
+
+            onPressed: () async{
+              final profile = await accountService.getAccountsProfile();
+              if (profile != null) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountsProfile(profile: profile),
+                  ),
+                );
+              }
+            },
+          ),
+
+        ),
       ),
+
+
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),

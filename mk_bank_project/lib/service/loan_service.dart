@@ -4,11 +4,14 @@ import 'package:http/http.dart' as http;
 import 'package:mk_bank_project/api/environment.dart';
 import 'package:mk_bank_project/dto/loan_dto.dart';
 import 'package:mk_bank_project/service/authservice.dart';
+import 'package:mk_bank_project/service/loan_payment_request.dart';
 
 
 class LoanService {
-  // আপনার API URL
+  // আপনার API URL (getMyLoans-এর জন্য ব্যবহৃত)
   final String _apiUrl = '${Environment.springUrl}/api/loans/myloans';
+  // আপনার API URL (loadUserLoans, fetchLoanDetails, payLoan-এর জন্য ব্যবহৃত)
+  final String _baseUrl = 'http://localhost:8085/api/loans';
   final AuthService _authService = AuthService();
 
   Future<List<LoanDTO>> getMyLoans() async {
@@ -46,4 +49,81 @@ class LoanService {
       throw Exception('Failed to load loans: ${response.statusCode}');
     }
   }
+  //=================
+
+  // ডামি টোকেন বাদ দিয়ে আসল AuthService থেকে টোকেন নেওয়া হলো।
+  Future<String?> _getAuthToken() async {
+    return await _authService.getToken();
+  }
+
+  // API কল করার জন্য হেডার তৈরি করা।
+  Future<Map<String, String>> _getHeaders() async {
+    // এখন আসল টোকেন ব্যবহার করা হচ্ছে।
+    final String? token = await _getAuthToken();
+
+    if (token == null) {
+      // টোকেন না পেলে ত্রুটি দেওয়া হলো।
+      throw Exception('Authentication token not found. Please login again.');
+    }
+
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
+  // ব্যবহারকারীর সমস্ত লোন লোড করা।
+  Future<List<LoanDTO>> loadUserLoans() async {
+    // যদি টোকেন না থাকে, _getHeaders() নিজেই Exception ছুঁড়বে।
+    final headers = await _getHeaders();
+
+    final url = Uri.parse('$_baseUrl/myloans');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => LoanDTO.fromJson(json)).toList();
+    } else {
+      // ত্রুটি বার্তা যাতে ইউজার দেখতে পায়
+      throw Exception('Failed to load loans: ${response.statusCode}');
+    }
+  }
+
+  // নির্বাচিত লোনের বিবরণ লোড করা।
+  Future<LoanDTO> fetchLoanDetails(int loanId) async {
+    final headers = await _getHeaders();
+
+    final url = Uri.parse('$_baseUrl/$loanId');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return LoanDTO.fromJson(jsonDecode(response.body));
+    } else {
+      final errorBody = jsonDecode(response.body);
+      throw Exception(errorBody['message'] ?? 'Loan not found');
+    }
+  }
+
+  // লোনের পেমেন্ট করা।
+  Future<void> payLoan(int loanId, double amount) async {
+    final headers = await _getHeaders();
+
+    final requestBody = LoanPaymentRequest(loanId: loanId, amount: amount);
+    final url = Uri.parse('$_baseUrl/pay');
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(requestBody.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      // পেমেন্ট সফল
+      return;
+    } else {
+      final errorBody = jsonDecode(response.body);
+      throw Exception(errorBody['message'] ?? 'Payment failed');
+    }
+  }
+
 }

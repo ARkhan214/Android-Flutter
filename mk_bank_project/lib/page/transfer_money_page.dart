@@ -19,6 +19,8 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  bool _isLoading = false;
+
   late AuthService authService;
   late AccountService accountService;
   late TransactionService transactionService;
@@ -44,6 +46,10 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
   void _submitTransfer() async {
     if (!_formKey.currentState!.validate()) return;
 
+    setState(() {
+      _isLoading = true;
+    });
+
     final transaction = Transaction(
       accountId: myAccount?['id'],
       receiverAccountId: int.parse(_receiverIdController.text),
@@ -66,6 +72,11 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Transfer Failed: $e')));
+    }finally {
+      // ✅ লোডিং শেষ, কাজ সফল হোক বা ব্যর্থ
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -73,17 +84,7 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Elevation and Shadow for a modern look
-        elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.5),
-
-        // Custom background color
         backgroundColor: Colors.white, // White background makes the content pop
-
-        // Custom height for better visual space (optional, but looks nice)
-        toolbarHeight: 70,
-
-        // Title: Using the same elegant font as the form title (Poppins)
         title: Text(
           'Transfer Money', // A more professional title
           style: GoogleFonts.poppins(
@@ -126,8 +127,16 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
               color: Color(0xFF1B4D8D), // Deep Blue color
               size: 24,
             ),
-            onPressed: () {
-              // Handle history/help action (You can replace this with your actual required action)
+            onPressed: () async {
+              final profile = await accountService.getAccountsProfile();
+              if (profile != null) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountsProfile(profile: profile),
+                  ),
+                );
+              }
             },
           ),
           const SizedBox(width: 10),
@@ -346,19 +355,58 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
                 const SizedBox(height: 40),
 
                 // --- Submit Button (Gradient/Shadow Effect) ---
+                // ElevatedButton(
+                //   onPressed: _submitTransfer,
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: const Color(0xFF1B4D8D), // Solid background for better contrast
+                //     foregroundColor: Colors.white,
+                //     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //     ),
+                //     elevation: 10, // Enhanced shadow
+                //     shadowColor: const Color(0xFF1B4D8D).withOpacity(0.5),
+                //   ),
+                //   child: Text(
+                //     'Confirm Transfer',
+                //     style: GoogleFonts.poppins(
+                //       fontSize: 18,
+                //       fontWeight: FontWeight.w600,
+                //       letterSpacing: 0.8,
+                //     ),
+                //   ),
+                // ),
+
+
+                // --- Submit Button (পরিবর্তিত) ---
                 ElevatedButton(
-                  onPressed: _submitTransfer,
+                  // ✅ যদি _isLoading হয়, তবে onPressed হবে null (বাটন ডিজেবল)
+                  onPressed: _isLoading ? null : _submitTransfer,
+
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B4D8D), // Solid background for better contrast
+                    backgroundColor: const Color(0xFF1B4D8D),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 10, // Enhanced shadow
+                    elevation: 10,
                     shadowColor: const Color(0xFF1B4D8D).withOpacity(0.5),
+                    // লোডিং অবস্থায় বাটনকে হালকা দেখানোর জন্য
+                    disabledBackgroundColor: const Color(0xFF1B4D8D).withOpacity(0.6),
                   ),
-                  child: Text(
+
+                  // ✅ Child পরিবর্তন
+                  child: _isLoading
+                      ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: const CircularProgressIndicator(
+                      color: Colors.white, // ইন্ডিকেটরের রং সাদা
+                      strokeWidth: 3,
+                    ),
+                  )
+                      : Text(
                     'Confirm Transfer',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
@@ -367,6 +415,7 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
                     ),
                   ),
                 ),
+
               ],
             ),
           ),

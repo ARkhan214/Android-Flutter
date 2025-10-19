@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
 import 'package:mk_bank_project/entity/transaction_model.dart';
+import 'package:mk_bank_project/service/account_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -24,6 +27,8 @@ class _MobileRechargePageState extends State<MobileRechargePage> {
   // 2. Angular FormControls এর সমতুল্য: TextEditingController এবং ভ্যালু
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _billingIdController = TextEditingController();
+
+  late AccountService accountService;
   String? _selectedOperator;
   String _token = '';
 
@@ -39,6 +44,7 @@ class _MobileRechargePageState extends State<MobileRechargePage> {
   @override
   void initState() {
     super.initState();
+    accountService = AccountService();
     _loadInitialData();
   }
 
@@ -161,10 +167,49 @@ class _MobileRechargePageState extends State<MobileRechargePage> {
   Widget build(BuildContext context) {
     // Angular-এর max-width: 720px এবং shadow-lg এর জন্য
     return Scaffold(
+
+      // appBar: AppBar(
+      //   title: const Text('📱 Mobile Recharge'),
+      //   backgroundColor: const Color(0xffd63384),
+      // ),
+
       appBar: AppBar(
-        title: const Text('📱 Mobile Recharge'),
-        backgroundColor: const Color(0xffd63384),
+        backgroundColor: Colors.white,
+        // Title
+        title: Text(
+          'Mobile Recharge',
+          style: GoogleFonts.poppins(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xffd63384), // Deep Pink
+          ),
+        ),
+        centerTitle: true,
+
+        // Leading: The back button
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10.0), // Little padding
+          child: IconButton(
+             icon:  const Icon(Icons.arrow_back_rounded, // A softer, modern back icon
+              color: Color(0xFFFD8E3D),
+             size: 28,
+             ), // Orange accent color
+
+            onPressed: () async{
+              final profile = await accountService.getAccountsProfile();
+              if (profile != null) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountsProfile(profile: profile),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
       ),
+
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),

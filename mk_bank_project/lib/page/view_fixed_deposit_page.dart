@@ -102,6 +102,7 @@ class _ViewFixedDepositPageState extends State<ViewFixedDepositPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: const Text('My Fixed Deposits'),
         backgroundColor: Colors.blue,

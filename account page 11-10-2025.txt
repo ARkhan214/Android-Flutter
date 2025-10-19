@@ -1,3 +1,2135 @@
+======================19-10 -2025-====Colourfull Bg er jonno=====================
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:carousel_slider/carousel_slider.dart'; // Carousel Slider এর জন্য
+import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/credit_card_bill_page.dart';
+import 'package:mk_bank_project/page/electricity_bill_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/gas_bill_page.dart';
+import 'package:mk_bank_project/page/internet_bill_page.dart';
+import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
+import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/mobile_recharge_page.dart';
+import 'package:mk_bank_project/page/pay_bill_page.dart';
+import 'package:mk_bank_project/page/statement_page.dart';
+import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/view_loan_page.dart';
+import 'package:mk_bank_project/page/water_bill_page.dart';
+import 'package:mk_bank_project/page/withdraw_page.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+
+// ----------------------------------------------------------------------
+// Custom Color Setup (Matching the homepage.jpg UI for MK Bank)
+// ----------------------------------------------------------------------
+
+// Top Header/AppBar এর নীচে হালকা নীল/সাদা ব্যাকগ্রাউন্ড
+const Color kBracBlueLight = Color(0xFFF7F9FB);
+// Primary Color (নেভি/MK Bank লোগো কালার)
+const Color kPrimaryNavy = Color(0xFF003D73);
+
+// ** আপডেট করা কালার: Bottom Menu-এর জন্য কমলা ব্যাকগ্রাউন্ড **
+const Color kBottomMenuOrangeBackground = Color(0xFFF7941D); // BRAC Bank Astha Old UI Orange
+const Color kBottomMenuOrange = Color(0xFFF9B208); // QR Icon Color
+const Color kBottomMenuBlue = Color(0xFF005691); // Icon Blue
+
+// আপনার কমেন্ট করা কোড থেকে রাখা হলো
+const Color kBottomMenuBackground = Color(0xFFF6F6F6); // Bottom Menu Background Color
+
+// ----------------------------------------------------------------------
+
+class AccountsProfile extends StatefulWidget {
+  final Map<String, dynamic> profile;
+
+  const AccountsProfile({super.key, required this.profile});
+
+  @override
+  State<AccountsProfile> createState() => _AccountsProfileState();
+}
+
+class _AccountsProfileState extends State<AccountsProfile> {
+  // আপনার কোড থেকে রাখা হলো
+  final AuthService _authService =  AuthService();
+  // State to manage balance visibility (ব্যবহার করা হয়নি, তবে রাখা হলো)
+  // bool _showBalance = false;
+
+  // Image URLs for the Carousel (এখন BRAC Bank অ্যাপের মতো প্লেসহোল্ডার)
+  final List<String> carouselImageUrls = const [
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkionStkOAGZhKzpA9hGZaE86WOoovUE78PA&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsUEUO1fH9kKByWeZ2ruXkcUe18kIJhDNmYg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_lq2Naa6vSwErDy2s7I70MttZyNwb7nzD8g&s',
+  ];
+
+  // Accounts, FDR/DPS, Credit Card, Loans মেনুর তালিকা
+  final List<Map<String, dynamic>> _topMenuTabs = const [
+    {'title': 'Accounts', 'page': ProfilePage()},
+    {'title': 'FDR/DPS', 'page': FixedDepositPage()},
+    {'title': 'Credit Card', 'page': CreditCardBillPage()},
+    {'title': 'Loans', 'page': ViewLoanPage()},
+  ];
+
+  // বোটম মেনু আইটেম (৯টি আইটেম, ২ সারি)
+  final List<Map<String, dynamic>> _bottomMenuItems = const [
+    {'title': 'bKash Pay', 'icon': Icons.payment_outlined, 'color': Color(0xFFE2136E), 'page': PayBillPage()},
+    {'title': 'Mobile Top-up', 'icon': Icons.phone_android, 'color': Color(0xFF005691), 'page': MobileRechargePage()},
+    {'title': 'QR', 'icon': Icons.qr_code_scanner, 'color': Color(0xFFF9B208), 'page': StatementPage()},
+    {'title': 'Payment', 'icon': Icons.receipt_long, 'color': Color(0xFF389E5F), 'page': PayBillPage()},
+    {'title': 'Open FD/DPS', 'icon': Icons.lock_clock_outlined, 'color': Color(0xFF6F4E37), 'page': FixedDepositPage()},
+    {'title': 'Sheba', 'icon': Icons.support_agent_outlined, 'color': Color(0xFF007A8A), 'page': StatementPage()},
+    {'title': 'Transfer', 'icon': Icons.send_outlined, 'color': Color(0xFFD30046), 'page': TransferMoneyPage()},
+    {'title': 'Other Apps', 'icon': Icons.apps_outlined, 'color': Color(0xFF007A8A), 'page': StatementPage()},
+    {'title': 'Astha Lifestyle', 'icon': Icons.favorite_border, 'color': Color(0xFF005691), 'page': StatementPage()},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontScale = screenWidth / 390; // Responsive Scaling
+
+    final String baseUrl = "http://localhost:8085/images/account/";
+    final String? photoName = widget.profile['photo'];
+    final String? photoUrl = (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
+
+    final String balance = widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
+    final String maskedBalance = '******';
+    final String displayBalance = '90,918.43'; // Hardcoded as per image
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      // ** AppBar: স্ক্রিনশট অনুযায়ী ডিজাইন **
+      appBar: _buildCustomAppBar(context, fontScale),
+
+      // ** Drawer (প্রোফাইল নেভিগেশনের জন্য) **
+      drawer: _buildAppDrawer(context, photoUrl, fontScale),
+
+      body: Stack(
+        children: [
+          // ** 1. Main Scrollable Content **
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ** 2. Profile and Account Card Section **
+                _buildProfileAndCardSection(context, photoUrl, displayBalance, fontScale),
+
+                // ** 3. Carousel Slider Section **
+                const SizedBox(height: 15),
+                _buildCarouselSlider(fontScale),
+                const SizedBox(height: 10),
+
+                // ** 4. Offer/Shortcut Section (Placeholders for other contents) **
+                _buildOfferShortcutSection(fontScale),
+
+                // ** বোটম মেনুর জন্য পর্যাপ্ত সাদা জায়গা **
+                // কমলার নীচের অংশ এবং নেভিগেশন বারের জন্য স্থান
+                SizedBox(height: 150 * fontScale),
+              ],
+            ),
+          ),
+          // ** 5. Bottom Floating Menu (স্ক্রিনশট অনুযায়ী) **
+          _buildBottomFloatingMenu(context, fontScale),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ AppBar Section (Custom Design) ------------------
+  PreferredSizeWidget _buildCustomAppBar(BuildContext context, double fontScale) {
+    return AppBar(
+      // AppBar এর রঙ স্ক্রিনশট অনুযায়ী (সাদা ব্যাকগ্রাউন্ডের উপরে নীল/নেভি)
+      backgroundColor: kBracBlueLight,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.menu, color: Colors.black, size: 28 * fontScale),
+        onPressed: () => Scaffold.of(context).openDrawer(),
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            'BN', // Language setting placeholder
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 16 * fontScale,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search, color: Colors.black, size: 28 * fontScale),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.power_settings_new, color: Colors.black, size: 28 * fontScale),
+          onPressed: () async {
+            await _authService.logout();
+            // Assuming LoginPage is the initial route after logout
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) =>  LoginPage()),
+            );
+          },
+        ),
+        SizedBox(width: 8 * fontScale),
+      ],
+    );
+  }
+
+  // ------------------ Drawer Section (Menu) ------------------
+  Widget _buildAppDrawer(BuildContext context, String? photoUrl, double fontScale) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: kPrimaryNavy),
+            accountName: Text(
+              widget.profile['name'] ?? 'Md. Rahim Khan',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17 * fontScale),
+            ),
+            accountEmail: Text(
+              widget.profile['user']?['email'] ?? 'mkbank@email.com',
+              style: TextStyle(fontSize: 14 * fontScale),
+            ),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 35 * fontScale,
+                backgroundImage: (photoUrl != null)
+                    ? NetworkImage(photoUrl)
+                    : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person, color: kPrimaryNavy),
+            title: Text('View Profile', style: TextStyle(fontSize: 15 * fontScale)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: Text(
+              'Logout',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 15 * fontScale),
+            ),
+            onTap: () async {
+              await _authService.logout();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) =>  LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ Profile and Account Card Section ------------------
+  Widget _buildProfileAndCardSection(BuildContext context, String? photoUrl, String displayBalance, double fontScale) {
+    return Container(
+      color: kBracBlueLight,
+      padding: EdgeInsets.only(bottom: 20 * fontScale),
+      child: Column(
+        children: [
+          // ** Profile Details: Name and View Profile **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale, vertical: 8 * fontScale),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Photo
+                CircleAvatar(
+                  radius: 30 * fontScale,
+                  backgroundColor: Colors.white,
+                  backgroundImage: (photoUrl != null)
+                      ? NetworkImage(photoUrl)
+                      : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                ),
+                SizedBox(width: 15 * fontScale),
+                // Welcome Text and Name
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome',
+                      style: TextStyle(fontSize: 14 * fontScale, color: Colors.grey.shade600),
+                    ),
+                    Text(
+                      widget.profile['name'] ?? 'Md. Rahim Khan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18 * fontScale,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage()));
+                      },
+                      child: Text(
+                        'View Profile',
+                        style: TextStyle(
+                          fontSize: 14 * fontScale,
+                          color: kPrimaryNavy,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // ** Top Navigation Tabs: Accounts, FDR/DPS, Credit Card, Loans **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale, vertical: 10 * fontScale),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _topMenuTabs.map((item) => _buildTopTab(context, item, fontScale)).toList(),
+              ),
+            ),
+          ),
+
+          // ** Account Card **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+            child: _buildAccountCard(displayBalance, fontScale),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper for Top Navigation Tabs
+  Widget _buildTopTab(BuildContext context, Map<String, dynamic> item, double fontScale) {
+    final bool isSelected = item['title'] == 'Accounts'; // Assuming 'Accounts' is the default selected tab
+    return GestureDetector(
+      onTap: () {
+        // নেভিগেশন logic
+        Navigator.push(context, MaterialPageRoute(builder: (_) => item['page'] as Widget));
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 15 * fontScale),
+        padding: EdgeInsets.symmetric(vertical: 8 * fontScale, horizontal: 10 * fontScale),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(5 * fontScale),
+          border: isSelected ? null : Border.all(color: Colors.grey.shade400, width: 1),
+        ),
+        child: Text(
+          item['title'] as String,
+          style: GoogleFonts.poppins(
+            fontSize: 14 * fontScale,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? kPrimaryNavy : Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper for Account Card
+  Widget _buildAccountCard(String displayBalance, double fontScale) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20 * fontScale),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10 * fontScale),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // 'Active' Badge
+          Positioned(
+            top: -10,
+            right: -10,
+            child: Transform.rotate(
+              angle: 0.8, // প্রায় 45 ডিগ্রি
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 3 * fontScale),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(5 * fontScale),
+                ),
+                child: Text(
+                  'Active',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 10 * fontScale,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SBA ACC TRIPLE BENEFITS',
+                style: GoogleFonts.poppins(
+                  fontSize: 14 * fontScale,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 5 * fontScale),
+              Text(
+                '1066695xxxxxxx', // Account ID
+                style: TextStyle(fontSize: 12 * fontScale, color: Colors.grey.shade600),
+              ),
+              SizedBox(height: 20 * fontScale),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Available Balance',
+                        style: TextStyle(fontSize: 12 * fontScale, color: Colors.grey.shade500),
+                      ),
+                      Text(
+                        '${displayBalance} BDT',
+                        style: GoogleFonts.poppins(
+                          fontSize: 22 * fontScale,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Share Icon
+                  Icon(Icons.share, color: kPrimaryNavy, size: 24 * fontScale),
+                ],
+              ),
+              SizedBox(height: 15 * fontScale),
+              // MK BANK Logo/Name (BRAC BANK এর বদলে MK BANK)
+              Text(
+                'MK BANK',
+                style: GoogleFonts.poppins(
+                  fontSize: 18 * fontScale,
+                  fontWeight: FontWeight.w800,
+                  color: kPrimaryNavy,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ Carousel Slider Implementation ------------------
+  Widget _buildCarouselSlider(double fontScale) {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 100 * fontScale,
+        autoPlay: true,
+        enlargeCenterPage: true,
+        viewportFraction: 0.9,
+        autoPlayInterval: const Duration(seconds: 4),
+        aspectRatio: 2.0,
+      ),
+      items: carouselImageUrls.map((imageUrl) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(color: Colors.grey.shade100);
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade300,
+                      child: Center(
+                        child: Text(
+                          "Offer Banner",
+                          style: TextStyle(fontSize: 14 * fontScale),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  // ------------------ Offer/Shortcut Section (Placeholder) ------------------
+  Widget _buildOfferShortcutSection(double fontScale) {
+    // এই সেকশনটি BRAC Bank স্ক্রিনশটে নেই, কিন্তু আপনি আগের কোডে রেখেছিলেন, তাই আপাতত রাখা হলো।
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Quick Links",
+            style: GoogleFonts.poppins(
+              fontSize: 16 * fontScale,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 10 * fontScale),
+          Wrap(
+            spacing: 10 * fontScale,
+            runSpacing: 10 * fontScale,
+            children: [
+              _buildShortcutCard("Statements", Icons.description_outlined, Colors.purple, fontScale, const StatementPage()),
+              _buildShortcutCard("Pay Bill", Icons.lightbulb_outline, Colors.blue, fontScale, const PayBillPage()),
+              _buildShortcutCard("Check Loan", Icons.request_page_outlined, Colors.brown, fontScale, const ViewLoanPage()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper Widget for Shortcut Cards (Updated)
+  Widget _buildShortcutCard(String title, IconData icon, Color iconColor, double fontScale, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Container(
+        width: 100 * fontScale,
+        padding: EdgeInsets.all(8 * fontScale),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(icon, color: iconColor, size: 24 * fontScale),
+            ),
+            SizedBox(height: 10 * fontScale),
+            Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12 * fontScale,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------ Bottom Floating Menu Section (কমেন্ট করা কোড) ------------------
+  // Widget _buildBottomFloatingMenu(BuildContext context, double fontScale) {
+  //   // বটম মেনুর ব্যাকগ্রাউন্ড
+  //   return Align(
+  //     alignment: Alignment.bottomCenter,
+  //     child: Container(
+  //       height: 140 * fontScale, // টোটাল হাইট (মেনু + নেভিগেশন বার)
+  //       color: Colors.white,
+  //       child: Column(
+  //         children: [
+  //           // ** আইকন মেনু গ্রিড **
+  //           Container(
+  //             height: 100 * fontScale,
+  //             color: kBottomMenuBackground, // হালকা ধূসর ব্যাকগ্রাউন্ড
+  //             padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 5 * fontScale),
+  //             child: GridView.builder(
+  //               physics: const NeverScrollableScrollPhysics(),
+  //               shrinkWrap: true,
+  //               itemCount: _bottomMenuItems.length,
+  //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //                 crossAxisCount: 5, // 5টি কলাম
+  //                 childAspectRatio: 0.8,
+  //                 crossAxisSpacing: 5 * fontScale,
+  //                 mainAxisSpacing: 5 * fontScale,
+  //               ),
+  //               itemBuilder: (context, index) {
+  //                 final item = _bottomMenuItems[index];
+  //                 return _buildBottomMenuItem(
+  //                   context,
+  //                   item['title'] as String,
+  //                   item['icon'] as IconData,
+  //                   item['color'] as Color,
+  //                   item['page'] as Widget,
+  //                   fontScale,
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //           // ** System Navigation Bar এর জন্য সাদা জায়গা **
+  //           Container(
+  //             height: 40 * fontScale,
+  //             color: Colors.white,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
+  // ------------------ Bottom Floating Menu Section (আপডেট করা কোড) ------------------
+  Widget _buildBottomFloatingMenu(BuildContext context, double fontScale) {
+    // বটম মেনুর ব্যাকগ্রাউন্ড
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        // ** হাইট ২ সারি এবং নেভিগেশন বারের জন্য সেট করা হলো **
+        height: 210 * fontScale,
+        // ** ব্যাকগ্রাউন্ড কালার: স্ক্রিনশট অনুযায়ী কমলা **
+        color: kBottomMenuOrangeBackground,
+        child: Column(
+          children: [
+            // ** আইকন মেনু গ্রিড (২টি সারি) **
+            Container(
+              // গ্রিডের হাইট
+              height: 170 * fontScale,
+              // ** গ্রিডের ব্যাকগ্রাউন্ড কালারও কমলা **
+              color: kBottomMenuOrangeBackground,
+              padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 5 * fontScale),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                // মোট ৯টি আইটেম প্রদর্শিত হবে
+                itemCount: _bottomMenuItems.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5, // ৫টি কলাম
+                  // দুটি সারি দেখাতে Aspect Ratio
+                  childAspectRatio: 0.8,
+                  crossAxisSpacing: 5 * fontScale,
+                  mainAxisSpacing: 5 * fontScale,
+                ),
+                itemBuilder: (context, index) {
+                  final item = _bottomMenuItems[index];
+                  return _buildBottomMenuItem(
+                    context,
+                    item['title'] as String,
+                    item['icon'] as IconData,
+                    item['color'] as Color,
+                    item['page'] as Widget,
+                    fontScale,
+                  );
+                },
+              ),
+            ),
+            // ** System Navigation Bar এর জন্য সাদা জায়গা **
+            Container(
+              height: 40 * fontScale,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+  //=====================
+
+  // Helper Widget for a single Bottom Menu Item
+  Widget _buildBottomMenuItem(BuildContext context, String title, IconData icon, Color color, Widget page, double fontScale) {
+    // QR আইকনটিকে মাঝখানে অন্য স্টাইলে দেখানো হয়েছে (স্ক্রিনশট অনুযায়ী)
+    if (title == 'QR') {
+      return Column(
+        children: [
+          Container(
+            width: 50 * fontScale,
+            height: 50 * fontScale,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            // QR আইকনের কালার আপনার সেট করা kBottomMenuOrange ব্যবহার করছে
+            child: Icon(icon, size: 30 * fontScale, color: kBottomMenuOrange),
+          ),
+          SizedBox(height: 5 * fontScale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11 * fontScale, color: Colors.black87),
+          ),
+        ],
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10 * fontScale),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+            ),
+            // অন্য আইকনগুলির কালার আপনার তালিকা থেকে আসবে
+            child: Icon(icon, size: 22 * fontScale, color: color),
+          ),
+          SizedBox(height: 5 * fontScale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11 * fontScale, color: Colors.white), // **কমলা ব্যাকগ্রাউন্ডের জন্য টেক্সট কালার সাদা করা হলো**
+          ),
+        ],
+      ),
+    );
+  }
+}
+========================19-10-2025====White Baground===================
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:carousel_slider/carousel_slider.dart'; // Carousel Slider এর জন্য
+import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/credit_card_bill_page.dart';
+import 'package:mk_bank_project/page/electricity_bill_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/gas_bill_page.dart';
+import 'package:mk_bank_project/page/internet_bill_page.dart';
+import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
+import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/mobile_recharge_page.dart';
+import 'package:mk_bank_project/page/pay_bill_page.dart';
+import 'package:mk_bank_project/page/statement_page.dart';
+import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/view_loan_page.dart';
+import 'package:mk_bank_project/page/water_bill_page.dart';
+import 'package:mk_bank_project/page/withdraw_page.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+
+// ----------------------------------------------------------------------
+// Custom Color Setup (Matching the BRAC Bank/bKash-like UI for MK Bank)
+// ----------------------------------------------------------------------
+
+// BRAC Bank এর Navigation Bar এর জন্য হালকা নীল/সাদা ব্যাকগ্রাউন্ড
+const Color kBracBlueLight = Color(0xFFF7F9FB);
+// আপনার Navigation Bar এর জন্য প্রাথমিক কালার
+const Color kPrimaryNavy = Color(0xFF003D73); // MK Bank Primary (ধরা হলো)
+// আপনার বটম মেনুর জন্য কমলা ও হলুদ কালার
+const Color kBottomMenuOrange = Color(0xFFF9B208); // Orange/Yellow
+const Color kBottomMenuBlue = Color(0xFF005691); // Blue
+const Color kBottomMenuBackground = Color(0xFFF6F6F6); // Bottom Menu Background Color
+
+// ----------------------------------------------------------------------
+
+class AccountsProfile extends StatefulWidget {
+  final Map<String, dynamic> profile;
+
+  const AccountsProfile({super.key, required this.profile});
+
+  @override
+  State<AccountsProfile> createState() => _AccountsProfileState();
+}
+
+class _AccountsProfileState extends State<AccountsProfile> {
+  final AuthService _authService =  AuthService();
+  // State to manage balance visibility (ব্যবহার করা হয়নি, তবে রাখা হলো)
+  // bool _showBalance = false;
+
+  // Image URLs for the Carousel (এখন BRAC Bank অ্যাপের মতো প্লেসহোল্ডার)
+  final List<String> carouselImageUrls = const [
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkionStkOAGZhKzpA9hGZaE86WOoovUE78PA&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsUEUO1fH9kKByWeZ2ruXkcUe18kIJhDNmYg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_lq2Naa6vSwErDy2s7I70MttZyNwb7nzD8g&s',
+  ];
+
+  // Accounts, FDR/DPS, Credit Card, Loans মেনুর তালিকা
+  final List<Map<String, dynamic>> _topMenuTabs = const [
+    {'title': 'Accounts', 'page': ProfilePage()},
+    {'title': 'FDR/DPS', 'page': FixedDepositPage()},
+    {'title': 'Credit Card', 'page': CreditCardBillPage()},
+    {'title': 'Loans', 'page': ViewLoanPage()},
+  ];
+
+  // বোটম মেনু আইটেম
+  final List<Map<String, dynamic>> _bottomMenuItems = const [
+    {'title': 'bKash Pay', 'icon': Icons.payment_outlined, 'color': Color(0xFFE2136E), 'page': PayBillPage()},
+    {'title': 'Mobile Top-up', 'icon': Icons.phone_android, 'color': Color(0xFF005691), 'page': MobileRechargePage()},
+    {'title': 'QR', 'icon': Icons.qr_code_scanner, 'color': Color(0xFFF9B208), 'page': StatementPage()},
+    {'title': 'Payment', 'icon': Icons.receipt_long, 'color': Color(0xFF389E5F), 'page': PayBillPage()},
+    {'title': 'Open FD/DPS', 'icon': Icons.lock_clock_outlined, 'color': Color(0xFF6F4E37), 'page': FixedDepositPage()},
+    {'title': 'Sheba', 'icon': Icons.support_agent_outlined, 'color': Color(0xFF007A8A), 'page': StatementPage()},
+    {'title': 'Transfer', 'icon': Icons.send_outlined, 'color': Color(0xFFD30046), 'page': TransferMoneyPage()},
+    {'title': 'Other Apps', 'icon': Icons.apps_outlined, 'color': Color(0xFF007A8A), 'page': StatementPage()},
+    {'title': 'Astha Lifestyle', 'icon': Icons.favorite_border, 'color': Color(0xFF005691), 'page': StatementPage()},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double fontScale = screenWidth / 390; // Responsive Scaling
+
+    final String baseUrl = "http://localhost:8085/images/account/";
+    final String? photoName = widget.profile['photo'];
+    final String? photoUrl = (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
+
+    final String balance = widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
+    final String maskedBalance = '******';
+    final String displayBalance = '90,918.43'; // Hardcoded as per image
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      // ** AppBar: স্ক্রিনশট অনুযায়ী ডিজাইন **
+      appBar: _buildCustomAppBar(context, fontScale),
+
+      // ** Drawer (প্রোফাইল নেভিগেশনের জন্য) **
+      drawer: _buildAppDrawer(context, photoUrl, fontScale),
+
+      body: Stack(
+        children: [
+          // ** 1. Main Scrollable Content **
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ** 2. Profile and Account Card Section **
+                _buildProfileAndCardSection(context, photoUrl, displayBalance, fontScale),
+
+                // ** 3. Carousel Slider Section **
+                const SizedBox(height: 15),
+                _buildCarouselSlider(fontScale),
+                const SizedBox(height: 10),
+
+                // ** 4. Offer/Shortcut Section (Placeholders for other contents) **
+                _buildOfferShortcutSection(fontScale),
+
+                // ** বোটম মেনুর জন্য পর্যাপ্ত সাদা জায়গা **
+                SizedBox(height: 150 * fontScale),
+              ],
+            ),
+          ),
+          // ** 5. Bottom Floating Menu (স্ক্রিনশট অনুযায়ী) **
+          _buildBottomFloatingMenu(context, fontScale),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ AppBar Section (Custom Design) ------------------
+  PreferredSizeWidget _buildCustomAppBar(BuildContext context, double fontScale) {
+    return AppBar(
+      // AppBar এর রঙ স্ক্রিনশট অনুযায়ী (সাদা ব্যাকগ্রাউন্ডের উপরে নীল/নেভি)
+      backgroundColor: kBracBlueLight,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.menu, color: Colors.black, size: 28 * fontScale),
+        onPressed: () => Scaffold.of(context).openDrawer(),
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            'BN', // Language setting placeholder
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 16 * fontScale,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search, color: Colors.black, size: 28 * fontScale),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.power_settings_new, color: Colors.black, size: 28 * fontScale),
+          onPressed: () async {
+            await _authService.logout();
+            // Assuming LoginPage is the initial route after logout
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) =>  LoginPage()),
+            );
+          },
+        ),
+        SizedBox(width: 8 * fontScale),
+      ],
+    );
+  }
+
+  // ------------------ Drawer Section (Menu) ------------------
+  Widget _buildAppDrawer(BuildContext context, String? photoUrl, double fontScale) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: kPrimaryNavy),
+            accountName: Text(
+              widget.profile['name'] ?? 'Md. Rahim Khan',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17 * fontScale),
+            ),
+            accountEmail: Text(
+              widget.profile['user']?['email'] ?? 'mkbank@email.com',
+              style: TextStyle(fontSize: 14 * fontScale),
+            ),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 35 * fontScale,
+                backgroundImage: (photoUrl != null)
+                    ? NetworkImage(photoUrl)
+                    : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person, color: kPrimaryNavy),
+            title: Text('View Profile', style: TextStyle(fontSize: 15 * fontScale)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: Text(
+              'Logout',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 15 * fontScale),
+            ),
+            onTap: () async {
+              await _authService.logout();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) =>  LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ Profile and Account Card Section ------------------
+  Widget _buildProfileAndCardSection(BuildContext context, String? photoUrl, String displayBalance, double fontScale) {
+    return Container(
+      color: kBracBlueLight,
+      padding: EdgeInsets.only(bottom: 20 * fontScale),
+      child: Column(
+        children: [
+          // ** Profile Details: Name and View Profile **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale, vertical: 8 * fontScale),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Photo
+                CircleAvatar(
+                  radius: 30 * fontScale,
+                  backgroundColor: Colors.white,
+                  backgroundImage: (photoUrl != null)
+                      ? NetworkImage(photoUrl)
+                      : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                ),
+                SizedBox(width: 15 * fontScale),
+                // Welcome Text and Name
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome',
+                      style: TextStyle(fontSize: 14 * fontScale, color: Colors.grey.shade600),
+                    ),
+                    Text(
+                      widget.profile['name'] ?? 'Md. Rahim Khan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18 * fontScale,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage()));
+                      },
+                      child: Text(
+                        'View Profile',
+                        style: TextStyle(
+                          fontSize: 14 * fontScale,
+                          color: kPrimaryNavy,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // ** Top Navigation Tabs: Accounts, FDR/DPS, Credit Card, Loans **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale, vertical: 10 * fontScale),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _topMenuTabs.map((item) => _buildTopTab(context, item, fontScale)).toList(),
+              ),
+            ),
+          ),
+
+          // ** Account Card **
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+            child: _buildAccountCard(displayBalance, fontScale),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper for Top Navigation Tabs
+  Widget _buildTopTab(BuildContext context, Map<String, dynamic> item, double fontScale) {
+    final bool isSelected = item['title'] == 'Accounts'; // Assuming 'Accounts' is the default selected tab
+    return GestureDetector(
+      onTap: () {
+        // নেভিগেশন logic
+        Navigator.push(context, MaterialPageRoute(builder: (_) => item['page'] as Widget));
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 15 * fontScale),
+        padding: EdgeInsets.symmetric(vertical: 8 * fontScale, horizontal: 10 * fontScale),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(5 * fontScale),
+          border: isSelected ? null : Border.all(color: Colors.grey.shade400, width: 1),
+        ),
+        child: Text(
+          item['title'] as String,
+          style: GoogleFonts.poppins(
+            fontSize: 14 * fontScale,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? kPrimaryNavy : Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper for Account Card
+  Widget _buildAccountCard(String displayBalance, double fontScale) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20 * fontScale),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10 * fontScale),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // 'Active' Badge
+          Positioned(
+            top: -10,
+            right: -10,
+            child: Transform.rotate(
+              angle: 0.8, // প্রায় 45 ডিগ্রি
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 3 * fontScale),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(5 * fontScale),
+                ),
+                child: Text(
+                  'Active',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 10 * fontScale,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SBA ACC TRIPLE BENEFITS',
+                style: GoogleFonts.poppins(
+                  fontSize: 14 * fontScale,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 5 * fontScale),
+              Text(
+                '1066695xxxxxxx', // Account ID
+                style: TextStyle(fontSize: 12 * fontScale, color: Colors.grey.shade600),
+              ),
+              SizedBox(height: 20 * fontScale),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Available Balance',
+                        style: TextStyle(fontSize: 12 * fontScale, color: Colors.grey.shade500),
+                      ),
+                      Text(
+                        '${displayBalance} BDT',
+                        style: GoogleFonts.poppins(
+                          fontSize: 22 * fontScale,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Share Icon
+                  Icon(Icons.share, color: kPrimaryNavy, size: 24 * fontScale),
+                ],
+              ),
+              SizedBox(height: 15 * fontScale),
+              // MK BANK Logo/Name
+              Text(
+                'MK BANK',
+                style: GoogleFonts.poppins(
+                  fontSize: 18 * fontScale,
+                  fontWeight: FontWeight.w800,
+                  color: kPrimaryNavy,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ Carousel Slider Implementation ------------------
+  Widget _buildCarouselSlider(double fontScale) {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 100 * fontScale,
+        autoPlay: true,
+        enlargeCenterPage: true,
+        viewportFraction: 0.9,
+        autoPlayInterval: const Duration(seconds: 4),
+        aspectRatio: 2.0,
+      ),
+      items: carouselImageUrls.map((imageUrl) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(color: Colors.grey.shade100);
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade300,
+                      child: Center(
+                        child: Text(
+                          "Offer Banner",
+                          style: TextStyle(fontSize: 14 * fontScale),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  // ------------------ Offer/Shortcut Section (Placeholder) ------------------
+  Widget _buildOfferShortcutSection(double fontScale) {
+    // এই সেকশনটি BRAC Bank স্ক্রিনশটে নেই, কিন্তু আপনি আগের কোডে রেখেছিলেন, তাই আপাতত রাখা হলো।
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Quick Links",
+            style: GoogleFonts.poppins(
+              fontSize: 16 * fontScale,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 10 * fontScale),
+          Wrap(
+            spacing: 10 * fontScale,
+            runSpacing: 10 * fontScale,
+            children: [
+              _buildShortcutCard("Statements", Icons.description_outlined, Colors.purple, fontScale, const StatementPage()),
+              _buildShortcutCard("Pay Bill", Icons.lightbulb_outline, Colors.blue, fontScale, const PayBillPage()),
+              _buildShortcutCard("Check Loan", Icons.request_page_outlined, Colors.brown, fontScale, const ViewLoanPage()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper Widget for Shortcut Cards (Updated)
+  Widget _buildShortcutCard(String title, IconData icon, Color iconColor, double fontScale, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Container(
+        width: 100 * fontScale,
+        padding: EdgeInsets.all(8 * fontScale),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(icon, color: iconColor, size: 24 * fontScale),
+            ),
+            SizedBox(height: 10 * fontScale),
+            Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12 * fontScale,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------ Bottom Floating Menu Section ------------------
+  // Widget _buildBottomFloatingMenu(BuildContext context, double fontScale) {
+  //   // বটম মেনুর ব্যাকগ্রাউন্ড
+  //   return Align(
+  //     alignment: Alignment.bottomCenter,
+  //     child: Container(
+  //       height: 140 * fontScale, // টোটাল হাইট (মেনু + নেভিগেশন বার)
+  //       color: Colors.white,
+  //       child: Column(
+  //         children: [
+  //           // ** আইকন মেনু গ্রিড **
+  //           Container(
+  //             height: 100 * fontScale,
+  //             color: kBottomMenuBackground, // হালকা ধূসর ব্যাকগ্রাউন্ড
+  //             padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 5 * fontScale),
+  //             child: GridView.builder(
+  //               physics: const NeverScrollableScrollPhysics(),
+  //               shrinkWrap: true,
+  //               itemCount: _bottomMenuItems.length,
+  //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //                 crossAxisCount: 5, // 5টি কলাম
+  //                 childAspectRatio: 0.8,
+  //                 crossAxisSpacing: 5 * fontScale,
+  //                 mainAxisSpacing: 5 * fontScale,
+  //               ),
+  //               itemBuilder: (context, index) {
+  //                 final item = _bottomMenuItems[index];
+  //                 return _buildBottomMenuItem(
+  //                   context,
+  //                   item['title'] as String,
+  //                   item['icon'] as IconData,
+  //                   item['color'] as Color,
+  //                   item['page'] as Widget,
+  //                   fontScale,
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //           // ** System Navigation Bar এর জন্য সাদা জায়গা **
+  //           Container(
+  //             height: 40 * fontScale,
+  //             color: Colors.white,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
+  // ------------------ Bottom Floating Menu Section ------------------
+  Widget _buildBottomFloatingMenu(BuildContext context, double fontScale) {
+    // বটম মেনুর ব্যাকগ্রাউন্ড
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        // ** হাইট বাড়ানো হলো, কারণ ২টি সারি (Row) দেখানো হবে **
+        height: 210 * fontScale, // 100 * 2 = 200 (আনুমানিক)
+        color: Colors.white,
+        child: Column(
+          children: [
+            // ** আইকন মেনু গ্রিড **
+            Container(
+              // ** হাইট পরিবর্তন করা হলো **
+              height: 170 * fontScale, // ২টি সারির জন্য পর্যাপ্ত উচ্চতা
+              color: kBottomMenuBackground, // হালকা ধূসর ব্যাকগ্রাউন্ড
+              padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 5 * fontScale),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                // ** এখানে পরিবর্তন: মোট ৯টি আইটেম দেখাতে **
+                itemCount: _bottomMenuItems.length, // এটি এখন ৯-কে নির্দেশ করবে
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5, // ৫টি কলাম
+                  // ** দুটি সারি দেখাতে Aspect Ratio পরিবর্তন করা হলো **
+                  childAspectRatio: 0.8,
+                  crossAxisSpacing: 5 * fontScale,
+                  mainAxisSpacing: 5 * fontScale,
+                ),
+                itemBuilder: (context, index) {
+                  final item = _bottomMenuItems[index];
+                  return _buildBottomMenuItem(
+                    context,
+                    item['title'] as String,
+                    item['icon'] as IconData,
+                    item['color'] as Color,
+                    item['page'] as Widget,
+                    fontScale,
+                  );
+                },
+              ),
+            ),
+            // ** System Navigation Bar এর জন্য সাদা জায়গা **
+            Container(
+              height: 40 * fontScale,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+  //=====================
+
+  // Helper Widget for a single Bottom Menu Item
+  Widget _buildBottomMenuItem(BuildContext context, String title, IconData icon, Color color, Widget page, double fontScale) {
+    // QR আইকনটিকে মাঝখানে অন্য স্টাইলে দেখানো হয়েছে (স্ক্রিনশট অনুযায়ী)
+    if (title == 'QR') {
+      return Column(
+        children: [
+          Container(
+            width: 50 * fontScale,
+            height: 50 * fontScale,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(icon, size: 30 * fontScale, color: kBottomMenuOrange),
+          ),
+          SizedBox(height: 5 * fontScale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11 * fontScale, color: Colors.black87),
+          ),
+        ],
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10 * fontScale),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+            ),
+            child: Icon(icon, size: 22 * fontScale, color: color),
+          ),
+          SizedBox(height: 5 * fontScale),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11 * fontScale, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+}
+================start 19-10-2-2025===================old
+old
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+// ** Import the carousel_slider package **
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/credit_card_bill_page.dart';
+import 'package:mk_bank_project/page/electricity_bill_page.dart';
+import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/gas_bill_page.dart';
+import 'package:mk_bank_project/page/internet_bill_page.dart';
+import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
+import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/mobile_recharge_page.dart';
+import 'package:mk_bank_project/page/pay_bill_page.dart';
+import 'package:mk_bank_project/page/statement_page.dart';
+import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/view_loan_page.dart';
+import 'package:mk_bank_project/page/water_bill_page.dart';
+import 'package:mk_bank_project/page/withdraw_page.dart';
+import 'package:mk_bank_project/service/authservice.dart';
+
+// ----------------------------------------------------------------------
+// Custom Color Setup (Matching the bKash-like UI)
+// ----------------------------------------------------------------------
+
+// Primary Pink Color
+const Color kPrimaryPink = Color(0xFFE91E63);
+// Secondary Reddish/Orange Color
+const Color kSecondaryRed = Color(0xFFE8112D);
+// Yellow for offers/highlights
+const Color kAccentYellow = Color(0xFFF9B208);
+
+// ----------------------------------------------------------------------
+
+// Changed to StatefulWidget to manage balance visibility
+class AccountsProfile extends StatefulWidget {
+  final Map<String, dynamic> profile;
+
+  const AccountsProfile({super.key, required this.profile}); // ** FIX 1: Colon (:) removed and changed to dot (.) **
+
+  @override
+  State<AccountsProfile> createState() => _AccountsProfileState();
+}
+
+class _AccountsProfileState extends State<AccountsProfile> {
+  final AuthService _authService =  AuthService(); // ** FIX 2: Added const for AuthService initialization **
+
+  // State to manage balance visibility
+  bool _showBalance = false;
+
+  // ** NEW STATE: To manage the visibility of the full menu **
+  bool _showFullMenu = false;
+
+  // Image URLs for the Carousel (Now used in _buildCarouselPlaceholder)
+  final List<String> carouselImageUrls = const [ // ** FIX 3: Added const to the list initialization **
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkionStkOAGZhKzpA9hGZaE86WOoovUE78PA&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsUEUO1fH9kKByWeZ2ruXkcUe18kIJhDNmYg&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_lq2Naa6vSwErDy2s7I70MttZyNwb7nzD8g&s',
+  ];
+
+  // List of all menu items (Total 12 items as per your images)
+  final List<Map<String, dynamic>> _allMenuItems = const [ // ** FIX 4: Added const to the list initialization **
+    {'title': 'ট্রান্সফার মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
+    {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
+    {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
+    //{'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
+
+    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const MobileRechargePage()},
+    // ** Fixed Deposit এবং DPS যোগ করা হলো **
+    {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
+    {'title': 'ভিউ ফিক্সড ডিপোজিট', 'icon': Icons.view_agenda_outlined, 'color': Colors.brown, 'page': const ViewFixedDepositPage()}, // Fixed Deposit
+    {'title': 'ডিপিএস', 'icon': Icons.auto_delete_outlined, 'color': Colors.indigo, 'page': const WithdrawPage()}, // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
+
+    {'title': 'লোন', 'icon': Icons.request_page_outlined, 'color': Colors.brown, 'page': const WithdrawPage()},
+    {'title': 'ভিউ লোন', 'icon': Icons.description, 'color': Colors.brown, 'page': const ViewLoanPage()},
+    {'title': 'পে লোন', 'icon': Icons.receipt_long, 'color': Colors.brown, 'page': const WithdrawPage()},
+
+    {'title': 'পেমেন্ট', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
+    {'title': 'অ্যাড মানি', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
+    {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const PayBillPage()},
+
+    // {'title': 'Credit Card Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const CreditCardBillPage()},
+    // {'title': 'Electricity Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const ElectricityBillPage()},
+    // {'title': 'Water Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WaterBillPage()},
+    // {'title': 'Gas Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const GasBillPage()},
+    // {'title': 'Internet Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const InternetBillPage()},
+
+    {'title': 'সেভিংস', 'icon': Icons.savings_outlined, 'color': Colors.pink, 'page': const WithdrawPage()},
+
+    // ** Extra 4 items for the 'See More' section **
+    {'title': 'ইনস্যুরেন্স', 'icon': Icons.health_and_safety_outlined, 'color': Colors.cyan, 'page': const WithdrawPage()},
+    {'title': 'বিকাশ টু ব্যাংক', 'icon': Icons.account_balance_outlined, 'color': Colors.green, 'page': const WithdrawPage()},
+    {'title': 'এডুকেশন ফি', 'icon': Icons.book_outlined, 'color': Colors.orange, 'page': const WithdrawPage()},
+    {'title': 'মাইক্রোফাইন্যান্স', 'icon': Icons.paid_outlined, 'color': Colors.deepPurple, 'page': const WithdrawPage()},
+    // You can add more items if needed for the third row, but we'll stick to 12 for 3 rows of 4
+
+
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    // Access profile using widget.profile
+    final double screenWidth = MediaQuery.of(context).size.width;
+    // ** Optimized fontScale **
+    final double fontScale = screenWidth / 390;
+
+    final String baseUrl = "http://localhost:8085/images/account/";
+    final String? photoName = widget.profile['photo'];
+    final String? photoUrl =
+    (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
+
+    // ... (balance and status logic is unchanged) ...
+    final String balance = widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
+    final String maskedBalance = '৳ *****';
+    final String displayBalance = _showBalance ? '৳ $balance' : maskedBalance;
+
+    final bool isActive = widget.profile['accountActiveStatus'] == true;
+    final String statusText = isActive ? 'Active' : 'Inactive';
+    final Color statusColor = isActive ? Colors.green.shade600 : Colors.red.shade600;
+
+    return WillPopScope(
+      onWillPop: () async {
+        // ** FIX 5: Added return type casting for WillPopScope **
+        Navigator.pop(context, true);
+        return Future.value(false); // Should return Future<bool>
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+
+        // ** Used Builder to get a context that can open the Drawer **
+        body: Builder(
+          builder: (context) {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ** 1. Top Header Section (Pass context for Drawer opening) **
+                  _buildTopHeader(context, photoUrl, fontScale),
+
+                  // ** 2. Dashboard Menu Icons **
+                  _buildDashboardMenu(context, fontScale),
+
+                  // ** 3. See More Button **
+                  _buildSeeMoreButton(fontScale),
+
+                  const Divider(height: 1, thickness: 0.5, color: Colors.grey),
+
+                  const SizedBox(height: 10),
+
+                  // ** 4. Carousel Slider Section (Now implemented) **
+                  _buildCarouselSlider(fontScale), // Changed function name
+
+                  const SizedBox(height: 20),
+
+                  // ** 5. Offer/Shortcut Section **
+                  _buildOfferShortcutSection(fontScale),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        ),
+
+        // ** Drawer Menu (Used your provided Drawer code structure) **
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                // Note: Replaced primaryColor.shade700 with kPrimaryPink
+                decoration: const BoxDecoration(color: kPrimaryPink), // ** FIX 6: Added const here **
+                accountName: Text(
+                  widget.profile['name'] ?? 'Unknown User',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17 * fontScale,
+                  ),
+                ),
+                accountEmail: Text(
+                  widget.profile['user']?['email'] ?? 'N/A',
+                  style: TextStyle(fontSize: 14 * fontScale),
+                ),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 35,
+                    backgroundImage: (photoUrl != null)
+                        ? NetworkImage(photoUrl)
+                        : const AssetImage('assets/images/default_avatar.png')
+                    as ImageProvider,
+                  ),
+                ),
+              ),
+              ListTile(
+                // Note: Replaced primaryColor with kPrimaryPink
+                leading: const Icon(Icons.person, color: kPrimaryPink),
+                title: Text(
+                  'View Profile',
+                  style: TextStyle(fontSize: 15 * fontScale),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                // Note: Replaced accentColor with kSecondaryRed
+                leading: const Icon(Icons.logout, color: kSecondaryRed),
+                title: Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: kSecondaryRed,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15 * fontScale,
+                  ),
+                ),
+                onTap: () async {
+                  await _authService.logout();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginPage()), // ** FIX 7: Added const here **
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  // ------------------ 1. Top Header Section ------------------
+  // Includes Profile Photo (Now clickable to open Drawer)
+  Widget _buildTopHeader(BuildContext context, String? photoUrl, double fontScale) {
+    return Container(
+      // ** Using fixed padding for edge responsiveness **
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 20),
+      color: kPrimaryPink, // Pink background
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ** Profile Photo (Clickable for Drawer) **
+              GestureDetector(
+                // ** FIX: Added onTap to open the drawer when photo is clicked **
+                onTap: () => Scaffold.of(context).openDrawer(),
+                child: CircleAvatar(
+                  radius: 25 * fontScale,
+                  backgroundColor: Colors.white,
+                  backgroundImage: (photoUrl != null)
+                      ? NetworkImage(photoUrl)
+                      : const AssetImage('assets/images/default_avatar.png')
+                  as ImageProvider,
+                ),
+              ),
+              // ** Top Right Icons **
+              Row(
+                children: [
+                  Icon(Icons.star_border, color: Colors.white, size: 24 * fontScale),
+                  SizedBox(width: 15 * fontScale),
+                  Icon(Icons.qr_code_scanner, color: Colors.white, size: 24 * fontScale),
+                  SizedBox(width: 5 * fontScale),
+                ],
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10 * fontScale),
+
+          // ** Name and Balance Section **
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ** User Name **
+              Text(
+                widget.profile['name'] ?? 'MK Bank User',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18 * fontScale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              // ** Notification Icon **
+              Icon(Icons.notifications_none, color: Colors.white, size: 24 * fontScale),
+            ],
+          ),
+
+          SizedBox(height: 10 * fontScale),
+
+          // ** Balance Section with Hide/Show Functionality **
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _showBalance = !_showBalance;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12 * fontScale, vertical: 8 * fontScale),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20 * fontScale),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _showBalance
+                        ? '৳ ${widget.profile['balance']?.toStringAsFixed(2) ?? '0.00'}'
+                        : '৳ *****',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16 * fontScale,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 8 * fontScale),
+                  Text(
+                    "ব্যালেন্স দেখুন", // "View Balance" in Bangla
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14 * fontScale,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Icon(
+                    _showBalance ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.white,
+                    size: 18 * fontScale,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ 2. Dashboard Menu Icons (Toggleable) ------------------
+  Widget _buildDashboardMenu(BuildContext context, double fontScale) {
+    // Show 8 items by default, or all items if _showFullMenu is true
+    final int itemCount = _showFullMenu ? _allMenuItems.length : 8;
+    final List<Map<String, dynamic>> displayedItems = _allMenuItems.sublist(0, itemCount);
+
+    return Padding(
+      // ** Responsive Padding **
+      padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 10 * fontScale),
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(), // Disable GridView scrolling
+        shrinkWrap: true,
+        itemCount: displayedItems.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          // ** Optimized Aspect Ratio for better fit on small screens **
+          childAspectRatio: 0.75, // Changed from 0.8 to 0.75
+          crossAxisSpacing: 5 * fontScale,
+          mainAxisSpacing: 10 * fontScale,
+        ),
+        itemBuilder: (context, index) {
+          final item = displayedItems[index];
+          return _buildMenuItem(
+              context,
+              item['title'] as String, // Type cast added for safety
+              item['icon'] as IconData, // Type cast added for safety
+              item['color'] as Color, // Type cast added for safety
+              fontScale,
+              item['page'] as Widget // Type cast added for safety
+          );
+        },
+      ),
+    );
+  }
+
+  // Helper Widget for a single Menu Item
+  Widget _buildMenuItem(BuildContext context, String title, IconData icon, Color color, double fontScale, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(12 * fontScale),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 25 * fontScale, color: color),
+          ),
+          SizedBox(height: 5 * fontScale),
+          // ** MaxLines added to prevent overflow on small screens **
+          Expanded(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12 * fontScale,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------ 3. See More Button (Toggle Logic) ------------------
+  Widget _buildSeeMoreButton(double fontScale) {
+    // Only show the button if there are more items to show (total items > 8)
+    if (_allMenuItems.length <= 8) return const SizedBox.shrink();
+
+    final String buttonText = _showFullMenu ? "বন্ধ করুন" : "আরো দেখুন";
+    final IconData buttonIcon = _showFullMenu ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
+
+    return Padding(
+      // ** Responsive Vertical Padding **
+      padding: EdgeInsets.symmetric(vertical: 5 * fontScale),
+      child: TextButton.icon(
+        onPressed: () {
+          setState(() {
+            _showFullMenu = !_showFullMenu; // Toggle the state
+          });
+        },
+        icon: Icon(buttonIcon, size: 20 * fontScale, color: kPrimaryPink),
+        label: Text(
+          buttonText,
+          style: TextStyle(
+            color: kPrimaryPink,
+            fontWeight: FontWeight.bold,
+            fontSize: 14 * fontScale,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ------------------ 4. Carousel Slider Implementation ------------------
+  Widget _buildCarouselSlider(double fontScale) {
+    return Padding(
+      // ** Removed Padding/Margin from here as CarouselOptions handles it (ViewportFraction)**
+      padding: EdgeInsets.zero,
+      child: CarouselSlider(
+        options: CarouselOptions(
+          // ** Height scaled **
+          height: 120 * fontScale,
+          autoPlay: true,
+          enlargeCenterPage: true,
+          // ** Keeps 90% of screen width **
+          viewportFraction: 0.9,
+          autoPlayInterval: const Duration(seconds: 4), // Added a standard interval
+          aspectRatio: 2.0,
+        ),
+        items: carouselImageUrls.map((imageUrl) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                // ** Fixed horizontal margin for spacing between cards **
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey.shade100,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                : null,
+                            color: kPrimaryPink,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade300,
+                        child: const Center(
+                          child: Icon(Icons.broken_image, color: Colors.red),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // ------------------ 5. Offer/Shortcut Section ------------------
+  Widget _buildOfferShortcutSection(double fontScale) {
+    return Padding(
+      // ** Responsive horizontal padding **
+      padding: EdgeInsets.symmetric(horizontal: 16 * fontScale),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "আমার অফারস", // "My Offers" in Bangla
+                style: GoogleFonts.poppins(
+                  fontSize: 16 * fontScale,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.edit, size: 16 * fontScale, color: Colors.grey.shade600),
+                label: Text(
+                  "এডিট", // "Edit" in Bangla
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10 * fontScale),
+
+          // ** Horizontal List of Shortcuts (as seen in the image) **
+          SizedBox(
+            // ** Height scaled **
+            height: 110 * fontScale,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _buildShortcutCard("মাই অফারস\নদেখতে ট্যাপ করুন", Icons.card_giftcard, kPrimaryPink, fontScale),
+                // ** Fixed gap for consistent spacing (better than scaled) **
+                const SizedBox(width: 15),
+                _buildShortcutCard("NSI Ass. Direct...", Icons.access_time_filled, Colors.lightGreen, fontScale),
+                const SizedBox(width: 15),
+                _buildShortcutCard("বিকাশ বান্ডেল", Icons.shopping_basket_outlined, Colors.purple, fontScale),
+                const SizedBox(width: 15),
+                _buildShortcutCard("জিপি মাই অফার", Icons.local_offer_outlined, Colors.blue, fontScale),
+                const SizedBox(width: 15), // End padding
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper Widget for Shortcut Cards
+  Widget _buildShortcutCard(String title, IconData icon, Color iconColor, double fontScale) {
+    return Container(
+      // ** Minimized width scaling to allow more flexibility with ListView **
+      width: 100 * fontScale,
+      padding: EdgeInsets.all(8 * fontScale),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Icon(icon, color: iconColor, size: 24 * fontScale),
+          ),
+          SizedBox(height: 10 * fontScale),
+          Text(
+            title,
+            // ** Added maxLines and overflow for responsiveness **
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12 * fontScale,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+==============end 19-10-2025======================
+
+
+
+
+
+
+
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';

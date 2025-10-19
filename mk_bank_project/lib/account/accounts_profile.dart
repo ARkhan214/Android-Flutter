@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 // ** Import the carousel_slider package **
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
@@ -9,9 +10,11 @@ import 'package:mk_bank_project/page/fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/gas_bill_page.dart';
 import 'package:mk_bank_project/page/internet_bill_page.dart';
 import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
+import 'package:mk_bank_project/page/loan_apply_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/mobile_recharge_page.dart';
 import 'package:mk_bank_project/page/pay_bill_page.dart';
+import 'package:mk_bank_project/page/pay_loan_page.dart';
 import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
@@ -37,14 +40,18 @@ const Color kAccentYellow = Color(0xFFF9B208);
 class AccountsProfile extends StatefulWidget {
   final Map<String, dynamic> profile;
 
-  const AccountsProfile({super.key, required this.profile}); // ** FIX 1: Colon (:) removed and changed to dot (.) **
+  const AccountsProfile({
+    super.key,
+    required this.profile,
+  }); // ** FIX 1: Colon (:) removed and changed to dot (.) **
 
   @override
   State<AccountsProfile> createState() => _AccountsProfileState();
 }
 
 class _AccountsProfileState extends State<AccountsProfile> {
-  final AuthService _authService =  AuthService(); // ** FIX 2: Added const for AuthService initialization **
+  final AuthService _authService =
+      AuthService(); // ** FIX 2: Added const for AuthService initialization **
 
   // State to manage balance visibility
   bool _showBalance = false;
@@ -53,32 +60,102 @@ class _AccountsProfileState extends State<AccountsProfile> {
   bool _showFullMenu = false;
 
   // Image URLs for the Carousel (Now used in _buildCarouselPlaceholder)
-  final List<String> carouselImageUrls = const [ // ** FIX 3: Added const to the list initialization **
+  final List<String> carouselImageUrls = const [
+    // ** FIX 3: Added const to the list initialization **
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkionStkOAGZhKzpA9hGZaE86WOoovUE78PA&s',
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsUEUO1fH9kKByWeZ2ruXkcUe18kIJhDNmYg&s',
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_lq2Naa6vSwErDy2s7I70MttZyNwb7nzD8g&s',
   ];
 
   // List of all menu items (Total 12 items as per your images)
-  final List<Map<String, dynamic>> _allMenuItems = const [ // ** FIX 4: Added const to the list initialization **
-    {'title': 'ট্রান্সফার মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
-    {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
-    {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
+  final List<Map<String, dynamic>> _allMenuItems = const [
+    // ** FIX 4: Added const to the list initialization **
+    {
+      'title': 'ট্রান্সফার মানি',
+      'icon': Icons.send_outlined,
+      'color': Colors.redAccent,
+      'page': const TransferMoneyPage(),
+    },
+    {
+      'title': 'স্টেটমেন্ট',
+      'icon': Icons.description_outlined,
+      'color': Colors.teal,
+      'page': const StatementPage(),
+    },
+    {
+      'title': 'শেষ লেনদেন',
+      'icon': Icons.receipt_outlined,
+      'color': Colors.deepOrange,
+      'page': const LastTransactionStatementPage(),
+    },
+
     //{'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
-
-    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const MobileRechargePage()},
+    {
+      'title': 'মোবাইল রিচার্জ',
+      'icon': Icons.phone_android,
+      'color': Colors.lightGreen,
+      'page': const MobileRechargePage(),
+    },
     // ** Fixed Deposit এবং DPS যোগ করা হলো **
-    {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
-    {'title': 'ভিউ ফিক্সড ডিপোজিট', 'icon': Icons.view_agenda_outlined, 'color': Colors.brown, 'page': const ViewFixedDepositPage()}, // Fixed Deposit
-    {'title': 'ডিপিএস', 'icon': Icons.auto_delete_outlined, 'color': Colors.indigo, 'page': const WithdrawPage()}, // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
+    {
+      'title': 'ফিক্সড ডিপোজিট',
+      'icon': Icons.lock_clock_outlined,
+      'color': Colors.deepOrange,
+      'page': const FixedDepositPage(),
+    },
+    // Fixed Deposit
+    {
+      'title': 'ভিউ ফিক্সড ডিপোজিট',
+      'icon': Icons.view_agenda_outlined,
+      'color': Colors.brown,
+      'page': const ViewFixedDepositPage(),
+    },
+    // Fixed Deposit
+    {
+      'title': 'ডিপিএস',
+      'icon': Icons.auto_delete_outlined,
+      'color': Colors.indigo,
+      'page': const WithdrawPage(),
+    },
 
-    {'title': 'লোন', 'icon': Icons.request_page_outlined, 'color': Colors.brown, 'page': const WithdrawPage()},
-    {'title': 'ভিউ লোন', 'icon': Icons.description, 'color': Colors.brown, 'page': const ViewLoanPage()},
-    {'title': 'পে লোন', 'icon': Icons.receipt_long, 'color': Colors.brown, 'page': const WithdrawPage()},
+    // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
+    {
+      'title': 'লোন',
+      'icon': Icons.request_page_outlined,
+      'color': Colors.brown,
+      'page': const LoanApplyPage(),
+    },
+    {
+      'title': 'ভিউ লোন',
+      'icon': Icons.description,
+      'color': Colors.brown,
+      'page': const ViewLoanPage(),
+    },
+    {
+      'title': 'পে লোন',
+      'icon': Icons.receipt_long,
+      'color': Colors.brown,
+      'page': const PayLoanPage(),
+    },
 
-    {'title': 'পেমেন্ট', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
-    {'title': 'অ্যাড মানি', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
-    {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const PayBillPage()},
+    {
+      'title': 'পেমেন্ট',
+      'icon': Icons.payment_outlined,
+      'color': Colors.purpleAccent,
+      'page': const WithdrawPage(),
+    },
+    {
+      'title': 'অ্যাড মানি',
+      'icon': Icons.add_card,
+      'color': Colors.blueAccent,
+      'page': const TransferMoneyPage(),
+    },
+    {
+      'title': 'পে বিল',
+      'icon': Icons.lightbulb_outline,
+      'color': Colors.indigo,
+      'page': const PayBillPage(),
+    },
     //
     // {'title': 'Credit Card Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const CreditCardBillPage()},
     // {'title': 'Electricity Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const ElectricityBillPage()},
@@ -86,16 +163,40 @@ class _AccountsProfileState extends State<AccountsProfile> {
     // {'title': 'Gas Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const GasBillPage()},
     // {'title': 'Internet Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const InternetBillPage()},
     //
-    {'title': 'সেভিংস', 'icon': Icons.savings_outlined, 'color': Colors.pink, 'page': const WithdrawPage()},
+    {
+      'title': 'সেভিংস',
+      'icon': Icons.savings_outlined,
+      'color': Colors.pink,
+      'page': const WithdrawPage(),
+    },
 
     // ** Extra 4 items for the 'See More' section **
-    {'title': 'ইনস্যুরেন্স', 'icon': Icons.health_and_safety_outlined, 'color': Colors.cyan, 'page': const WithdrawPage()},
-    {'title': 'বিকাশ টু ব্যাংক', 'icon': Icons.account_balance_outlined, 'color': Colors.green, 'page': const WithdrawPage()},
-    {'title': 'এডুকেশন ফি', 'icon': Icons.book_outlined, 'color': Colors.orange, 'page': const WithdrawPage()},
-    {'title': 'মাইক্রোফাইন্যান্স', 'icon': Icons.paid_outlined, 'color': Colors.deepPurple, 'page': const WithdrawPage()},
+    {
+      'title': 'ইনস্যুরেন্স',
+      'icon': Icons.health_and_safety_outlined,
+      'color': Colors.cyan,
+      'page': const WithdrawPage(),
+    },
+    {
+      'title': 'বিকাশ টু ব্যাংক',
+      'icon': Icons.account_balance_outlined,
+      'color': Colors.green,
+      'page': const WithdrawPage(),
+    },
+    {
+      'title': 'এডুকেশন ফি',
+      'icon': Icons.book_outlined,
+      'color': Colors.orange,
+      'page': const WithdrawPage(),
+    },
+    {
+      'title': 'মাইক্রোফাইন্যান্স',
+      'icon': Icons.paid_outlined,
+      'color': Colors.deepPurple,
+      'page': const WithdrawPage(),
+    },
+
     // You can add more items if needed for the third row, but we'll stick to 12 for 3 rows of 4
-
-
   ];
 
   @override
@@ -107,17 +208,22 @@ class _AccountsProfileState extends State<AccountsProfile> {
 
     final String baseUrl = "http://localhost:8085/images/account/";
     final String? photoName = widget.profile['photo'];
-    final String? photoUrl =
-    (photoName != null && photoName.isNotEmpty) ? "$baseUrl$photoName" : null;
+    final String? photoUrl = (photoName != null && photoName.isNotEmpty)
+        ? "$baseUrl$photoName"
+        : null;
 
     // ... (balance and status logic is unchanged) ...
-    final String balance = widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
+    final String id = widget.profile['id'].toString();
+    final String balance =
+        widget.profile['balance']?.toStringAsFixed(2) ?? '0.00';
     final String maskedBalance = '৳ *****';
     final String displayBalance = _showBalance ? '৳ $balance' : maskedBalance;
 
     final bool isActive = widget.profile['accountActiveStatus'] == true;
     final String statusText = isActive ? 'Active' : 'Inactive';
-    final Color statusColor = isActive ? Colors.green.shade600 : Colors.red.shade600;
+    final Color statusColor = isActive
+        ? Colors.green.shade600
+        : Colors.red.shade600;
 
     return WillPopScope(
       onWillPop: () async {
@@ -149,8 +255,9 @@ class _AccountsProfileState extends State<AccountsProfile> {
                   const SizedBox(height: 10),
 
                   // ** 4. Carousel Slider Section (Now implemented) **
-                  _buildCarouselSlider(fontScale), // Changed function name
+                  _buildCarouselSlider(fontScale),
 
+                  // Changed function name
                   const SizedBox(height: 20),
 
                   // ** 5. Offer/Shortcut Section **
@@ -170,7 +277,8 @@ class _AccountsProfileState extends State<AccountsProfile> {
             children: [
               UserAccountsDrawerHeader(
                 // Note: Replaced primaryColor.shade700 with kPrimaryPink
-                decoration: const BoxDecoration(color: kPrimaryPink), // ** FIX 6: Added const here **
+                decoration: const BoxDecoration(color: kPrimaryPink),
+                // ** FIX 6: Added const here **
                 accountName: Text(
                   widget.profile['name'] ?? 'Unknown User',
                   style: TextStyle(
@@ -189,7 +297,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                     backgroundImage: (photoUrl != null)
                         ? NetworkImage(photoUrl)
                         : const AssetImage('assets/images/default_avatar.png')
-                    as ImageProvider,
+                              as ImageProvider,
                   ),
                 ),
               ),
@@ -225,7 +333,9 @@ class _AccountsProfileState extends State<AccountsProfile> {
                   await _authService.logout();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => LoginPage()), // ** FIX 7: Added const here **
+                    MaterialPageRoute(
+                      builder: (_) => LoginPage(),
+                    ), // ** FIX 7: Added const here **
                   );
                 },
               ),
@@ -236,13 +346,21 @@ class _AccountsProfileState extends State<AccountsProfile> {
     );
   }
 
-
   // ------------------ 1. Top Header Section ------------------
   // Includes Profile Photo (Now clickable to open Drawer)
-  Widget _buildTopHeader(BuildContext context, String? photoUrl, double fontScale) {
+  Widget _buildTopHeader(
+    BuildContext context,
+    String? photoUrl,
+    double fontScale,
+  ) {
     return Container(
       // ** Using fixed padding for edge responsiveness **
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 20),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.of(context).padding.top + 12,
+        16,
+        20,
+      ),
       color: kPrimaryPink, // Pink background
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,15 +378,23 @@ class _AccountsProfileState extends State<AccountsProfile> {
                   backgroundImage: (photoUrl != null)
                       ? NetworkImage(photoUrl)
                       : const AssetImage('assets/images/default_avatar.png')
-                  as ImageProvider,
+                            as ImageProvider,
                 ),
               ),
               // ** Top Right Icons **
               Row(
                 children: [
-                  Icon(Icons.star_border, color: Colors.white, size: 24 * fontScale),
+                  Icon(
+                    Icons.star_border,
+                    color: Colors.white,
+                    size: 24 * fontScale,
+                  ),
                   SizedBox(width: 15 * fontScale),
-                  Icon(Icons.qr_code_scanner, color: Colors.white, size: 24 * fontScale),
+                  Icon(
+                    Icons.qr_code_scanner,
+                    color: Colors.white,
+                    size: 24 * fontScale,
+                  ),
                   SizedBox(width: 5 * fontScale),
                 ],
               ),
@@ -290,11 +416,37 @@ class _AccountsProfileState extends State<AccountsProfile> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               // ** Notification Icon **
-              Icon(Icons.notifications_none, color: Colors.white, size: 24 * fontScale),
+              Icon(
+                Icons.notifications_none,
+                color: Colors.white,
+                size: 24 * fontScale,
+              ),
             ],
           ),
-
+          SizedBox(height: 10 * fontScale),
+          Row(
+            children: [
+              Text(
+                'Account ID - ',
+                style: GoogleFonts.poppins(
+              color: Colors.white, // লেবেল হালকা সাদা রং
+                fontSize: 18 * fontScale, // ছোট ফন্ট সাইজ
+                fontWeight: FontWeight.w400
+          )
+              ),
+              Text(
+                // ✅ activeProfile থেকে 'id' ব্যবহার করা হলো এবং স্ট্রিং এ রূপান্তর করা হলো
+                widget.profile['id']?.toString() ?? 'ID: N/A',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18 * fontScale,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: 10 * fontScale),
 
           // ** Balance Section with Hide/Show Functionality **
@@ -305,7 +457,10 @@ class _AccountsProfileState extends State<AccountsProfile> {
               });
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12 * fontScale, vertical: 8 * fontScale),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12 * fontScale,
+                vertical: 8 * fontScale,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(20 * fontScale),
@@ -324,6 +479,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                     ),
                   ),
                   SizedBox(width: 8 * fontScale),
+
                   Text(
                     "ব্যালেন্স দেখুন", // "View Balance" in Bangla
                     style: GoogleFonts.poppins(
@@ -332,6 +488,7 @@ class _AccountsProfileState extends State<AccountsProfile> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+
                   Icon(
                     _showBalance ? Icons.visibility_off : Icons.visibility,
                     color: Colors.white,
@@ -350,13 +507,20 @@ class _AccountsProfileState extends State<AccountsProfile> {
   Widget _buildDashboardMenu(BuildContext context, double fontScale) {
     // Show 8 items by default, or all items if _showFullMenu is true
     final int itemCount = _showFullMenu ? _allMenuItems.length : 8;
-    final List<Map<String, dynamic>> displayedItems = _allMenuItems.sublist(0, itemCount);
+    final List<Map<String, dynamic>> displayedItems = _allMenuItems.sublist(
+      0,
+      itemCount,
+    );
 
     return Padding(
       // ** Responsive Padding **
-      padding: EdgeInsets.symmetric(horizontal: 10 * fontScale, vertical: 10 * fontScale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10 * fontScale,
+        vertical: 10 * fontScale,
+      ),
       child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(), // Disable GridView scrolling
+        physics: const NeverScrollableScrollPhysics(),
+        // Disable GridView scrolling
         shrinkWrap: true,
         itemCount: displayedItems.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -369,12 +533,12 @@ class _AccountsProfileState extends State<AccountsProfile> {
         itemBuilder: (context, index) {
           final item = displayedItems[index];
           return _buildMenuItem(
-              context,
-              item['title'] as String, // Type cast added for safety
-              item['icon'] as IconData, // Type cast added for safety
-              item['color'] as Color, // Type cast added for safety
-              fontScale,
-              item['page'] as Widget // Type cast added for safety
+            context,
+            item['title'] as String, // Type cast added for safety
+            item['icon'] as IconData, // Type cast added for safety
+            item['color'] as Color, // Type cast added for safety
+            fontScale,
+            item['page'] as Widget, // Type cast added for safety
           );
         },
       ),
@@ -382,7 +546,14 @@ class _AccountsProfileState extends State<AccountsProfile> {
   }
 
   // Helper Widget for a single Menu Item
-  Widget _buildMenuItem(BuildContext context, String title, IconData icon, Color color, double fontScale, Widget page) {
+  Widget _buildMenuItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    double fontScale,
+    Widget page,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => page));
@@ -424,7 +595,9 @@ class _AccountsProfileState extends State<AccountsProfile> {
     if (_allMenuItems.length <= 8) return const SizedBox.shrink();
 
     final String buttonText = _showFullMenu ? "বন্ধ করুন" : "আরো দেখুন";
-    final IconData buttonIcon = _showFullMenu ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
+    final IconData buttonIcon = _showFullMenu
+        ? Icons.keyboard_arrow_up
+        : Icons.keyboard_arrow_down;
 
     return Padding(
       // ** Responsive Vertical Padding **
@@ -461,7 +634,8 @@ class _AccountsProfileState extends State<AccountsProfile> {
           enlargeCenterPage: true,
           // ** Keeps 90% of screen width **
           viewportFraction: 0.9,
-          autoPlayInterval: const Duration(seconds: 4), // Added a standard interval
+          autoPlayInterval: const Duration(seconds: 4),
+          // Added a standard interval
           aspectRatio: 2.0,
         ),
         items: carouselImageUrls.map((imageUrl) {
@@ -486,20 +660,27 @@ class _AccountsProfileState extends State<AccountsProfile> {
                   child: Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.grey.shade100,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                : null,
-                            color: kPrimaryPink,
-                          ),
-                        ),
-                      );
-                    },
+                    loadingBuilder:
+                        (
+                          BuildContext context,
+                          Widget child,
+                          ImageChunkEvent? loadingProgress,
+                        ) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey.shade100,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: kPrimaryPink,
+                              ),
+                            ),
+                          );
+                        },
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey.shade300,
@@ -539,7 +720,11 @@ class _AccountsProfileState extends State<AccountsProfile> {
               ),
               TextButton.icon(
                 onPressed: () {},
-                icon: Icon(Icons.edit, size: 16 * fontScale, color: Colors.grey.shade600),
+                icon: Icon(
+                  Icons.edit,
+                  size: 16 * fontScale,
+                  color: Colors.grey.shade600,
+                ),
                 label: Text(
                   "এডিট", // "Edit" in Bangla
                   style: TextStyle(color: Colors.grey.shade600),
@@ -557,14 +742,34 @@ class _AccountsProfileState extends State<AccountsProfile> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                _buildShortcutCard("মাই অফারস\নদেখতে ট্যাপ করুন", Icons.card_giftcard, kPrimaryPink, fontScale),
+                _buildShortcutCard(
+                  "মাই অফারস\নদেখতে ট্যাপ করুন",
+                  Icons.card_giftcard,
+                  kPrimaryPink,
+                  fontScale,
+                ),
                 // ** Fixed gap for consistent spacing (better than scaled) **
                 const SizedBox(width: 15),
-                _buildShortcutCard("NSI Ass. Direct...", Icons.access_time_filled, Colors.lightGreen, fontScale),
+                _buildShortcutCard(
+                  "NSI Ass. Direct...",
+                  Icons.access_time_filled,
+                  Colors.lightGreen,
+                  fontScale,
+                ),
                 const SizedBox(width: 15),
-                _buildShortcutCard("বিকাশ বান্ডেল", Icons.shopping_basket_outlined, Colors.purple, fontScale),
+                _buildShortcutCard(
+                  "বিকাশ বান্ডেল",
+                  Icons.shopping_basket_outlined,
+                  Colors.purple,
+                  fontScale,
+                ),
                 const SizedBox(width: 15),
-                _buildShortcutCard("জিপি মাই অফার", Icons.local_offer_outlined, Colors.blue, fontScale),
+                _buildShortcutCard(
+                  "জিপি মাই অফার",
+                  Icons.local_offer_outlined,
+                  Colors.blue,
+                  fontScale,
+                ),
                 const SizedBox(width: 15), // End padding
               ],
             ),
@@ -575,7 +780,12 @@ class _AccountsProfileState extends State<AccountsProfile> {
   }
 
   // Helper Widget for Shortcut Cards
-  Widget _buildShortcutCard(String title, IconData icon, Color iconColor, double fontScale) {
+  Widget _buildShortcutCard(
+    String title,
+    IconData icon,
+    Color iconColor,
+    double fontScale,
+  ) {
     return Container(
       // ** Minimized width scaling to allow more flexibility with ListView **
       width: 100 * fontScale,

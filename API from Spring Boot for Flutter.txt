@@ -1,17 +1,48 @@
 API For Login
 POST-http://localhost:8085/api/user/login
 
+
 API For Admin Profile
 GET-http://localhost:8085/api/user/profile
 
+
 API For Account Holder Profile
 GET-http://localhost:8085/api/account/profile
+Bearer Token--->token
+
 
 API For Employees Profile
 GET-http://localhost:8085/api/employees/profile
 
+
 API For Cashout
 POST-http://localhost:8085/api/transactions/add
+
+
+API For Login (Anyone)
+POST http://localhost:8085/api/user/login
+Body raw -->
+{
+    "email":"mdrahimkhan107107@gmail.com",
+    "password":"12345"
+}
+response-->
+{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZHJhaGlta2hhbjEwNzEwN0BnbWFpbC5jb20iLCJpZCI6NCwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NjA4OTY3OTAsImV4cCI6MTc2MDk4MzE5MH0.tvLFNGCGxYapZgG7IS_oMwye1RxfQN1RmbbBa2WIjJE",
+    "message": "User Login Successful"
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -25,6 +56,13 @@ Url for Employee Photo
 
 Url for Account Holder Photo
 'http://localhost:8085/images/account/'
+
+
+
+
+
+
+
 
 
 ===========================

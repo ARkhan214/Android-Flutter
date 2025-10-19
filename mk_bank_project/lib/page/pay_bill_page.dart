@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mk_bank_project/account/accounts_profile.dart';
+import 'package:mk_bank_project/service/account_service.dart';
 
 // ⚠️ আপনার আসল ফাইল পাথ অনুযায়ী অন্যান্য পেজগুলো ইম্পোর্ট করুন
 import 'credit_card_bill_page.dart';
@@ -81,8 +84,15 @@ final List<MenuOption> billPaymentOptions = [
 // 3. PayBillPage উইজেট (AccountsProfile স্টাইল)
 // ----------------------------------------------------------------------
 
-class PayBillPage extends StatelessWidget {
+class PayBillPage extends StatefulWidget {
   const PayBillPage({super.key});
+
+  @override
+  State<PayBillPage> createState() => _PayBillPageState();
+}
+
+class _PayBillPageState extends State<PayBillPage> {
+  late AccountService accountService;
 
   // AccountsProfile-এর মতো responsiveness-এর জন্য
   int _getCrossAxisCount(BuildContext context) {
@@ -95,7 +105,11 @@ class PayBillPage extends StatelessWidget {
     }
   }
 
-  // Helper Widget for a single Menu Item (AccountsProfile-এর _buildMenuItem-এর মতো)
+
+  @override
+  void initState() {
+    accountService = AccountService();
+  } // Helper Widget for a single Menu Item (AccountsProfile-এর _buildMenuItem-এর মতো)
   Widget _buildMenuItem(BuildContext context, MenuOption option, double fontScale) {
     return GestureDetector(
       onTap: () {
@@ -137,11 +151,51 @@ class PayBillPage extends StatelessWidget {
     final double fontScale = screenWidth / 390;
 
     return Scaffold(
+
+      // appBar: AppBar(
+      //   title: const Text('পে বিল'),
+      //   backgroundColor: Colors.indigo,
+      //   elevation: 0, // AccountsProfile-এর ডিজাইনের সাথে মিল রাখার জন্য
+      // ),
+
       appBar: AppBar(
-        title: const Text('পে বিল'),
-        backgroundColor: Colors.indigo,
-        elevation: 0, // AccountsProfile-এর ডিজাইনের সাথে মিল রাখার জন্য
+        backgroundColor: Colors.white,
+        // Title
+        title: Text(
+          'Mobile Recharge',
+          style: GoogleFonts.poppins(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xffd63384), // Deep Pink
+          ),
+        ),
+        centerTitle: true,
+
+        // Leading: The back button
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10.0), // Little padding
+          child: IconButton(
+            icon:  const Icon(Icons.arrow_back_rounded, // A softer, modern back icon
+              color: Color(0xFFFD8E3D),
+              size: 28,
+            ), // Orange accent color
+
+            onPressed: () async{
+              final profile = await accountService.getAccountsProfile();
+              if (profile != null) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountsProfile(profile: profile),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
       ),
+      //=====
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
