@@ -3,13 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 // ** Import the carousel_slider package **
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
+import 'package:mk_bank_project/page/credit_card_bill_page.dart';
+import 'package:mk_bank_project/page/electricity_bill_page.dart';
 import 'package:mk_bank_project/page/fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/gas_bill_page.dart';
+import 'package:mk_bank_project/page/internet_bill_page.dart';
 import 'package:mk_bank_project/page/last_transaction_statement_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/mobile_recharge_page.dart';
+import 'package:mk_bank_project/page/pay_bill_page.dart';
 import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/view_loan_page.dart';
+import 'package:mk_bank_project/page/water_bill_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
@@ -54,12 +61,12 @@ class _AccountsProfileState extends State<AccountsProfile> {
 
   // List of all menu items (Total 12 items as per your images)
   final List<Map<String, dynamic>> _allMenuItems = const [ // ** FIX 4: Added const to the list initialization **
-    {'title': 'সেন্ড মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
+    {'title': 'ট্রান্সফার মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
     {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
     {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
-    {'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
+    //{'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
 
-    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const TransferMoneyPage()},
+    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const MobileRechargePage()},
     // ** Fixed Deposit এবং DPS যোগ করা হলো **
     {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
     {'title': 'ভিউ ফিক্সড ডিপোজিট', 'icon': Icons.view_agenda_outlined, 'color': Colors.brown, 'page': const ViewFixedDepositPage()}, // Fixed Deposit
@@ -71,7 +78,14 @@ class _AccountsProfileState extends State<AccountsProfile> {
 
     {'title': 'পেমেন্ট', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
     {'title': 'অ্যাড মানি', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
-    {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WithdrawPage()},
+    {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const PayBillPage()},
+    //
+    // {'title': 'Credit Card Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const CreditCardBillPage()},
+    // {'title': 'Electricity Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const ElectricityBillPage()},
+    // {'title': 'Water Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WaterBillPage()},
+    // {'title': 'Gas Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const GasBillPage()},
+    // {'title': 'Internet Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const InternetBillPage()},
+    //
     {'title': 'সেভিংস', 'icon': Icons.savings_outlined, 'color': Colors.pink, 'page': const WithdrawPage()},
 
     // ** Extra 4 items for the 'See More' section **

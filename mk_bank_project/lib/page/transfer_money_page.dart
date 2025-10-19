@@ -85,7 +85,7 @@ class _TransferMoneyPageState extends State<TransferMoneyPage> {
 
         // Title: Using the same elegant font as the form title (Poppins)
         title: Text(
-          'Send Money', // A more professional title
+          'Transfer Money', // A more professional title
           style: GoogleFonts.poppins(
             fontSize: 22,
             fontWeight: FontWeight.w700,
