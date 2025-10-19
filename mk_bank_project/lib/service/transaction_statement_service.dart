@@ -8,7 +8,7 @@ import 'package:mk_bank_project/service/authservice.dart';
 
 
 class TransactionStatementService {
-  // আপনার environment.dart থেকে baseUrl নিন (যেমন: http://localhost:8085/api)
+  // আপনার environment.dart থেকে baseUrl নিন (যেমন: http://localhost:8085)
   final String _baseUrl = Environment.springUrl;
   final AuthService authService; // DI এর মাধ্যমে AuthService নিন
 

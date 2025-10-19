@@ -9,6 +9,7 @@ import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
+import 'package:mk_bank_project/page/view_loan_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 
@@ -54,21 +55,25 @@ class _AccountsProfileState extends State<AccountsProfile> {
   // List of all menu items (Total 12 items as per your images)
   final List<Map<String, dynamic>> _allMenuItems = const [ // ** FIX 4: Added const to the list initialization **
     {'title': 'সেন্ড মানি', 'icon': Icons.send_outlined, 'color': Colors.redAccent, 'page': const TransferMoneyPage()},
-    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const TransferMoneyPage()},
+    {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
+    {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
     {'title': 'ক্যাশ আউট', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.teal, 'page': const WithdrawPage()},
 
+    {'title': 'মোবাইল রিচার্জ', 'icon': Icons.phone_android, 'color': Colors.lightGreen, 'page': const TransferMoneyPage()},
     // ** Fixed Deposit এবং DPS যোগ করা হলো **
     {'title': 'ফিক্সড ডিপোজিট', 'icon': Icons.lock_clock_outlined, 'color': Colors.deepOrange, 'page': const FixedDepositPage()}, // Fixed Deposit
     {'title': 'ভিউ ফিক্সড ডিপোজিট', 'icon': Icons.view_agenda_outlined, 'color': Colors.brown, 'page': const ViewFixedDepositPage()}, // Fixed Deposit
     {'title': 'ডিপিএস', 'icon': Icons.auto_delete_outlined, 'color': Colors.indigo, 'page': const WithdrawPage()}, // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
-    {'title': 'স্টেটমেন্ট', 'icon': Icons.description_outlined, 'color': Colors.teal, 'page': const StatementPage()},
-    {'title': 'শেষ লেনদেন', 'icon': Icons.receipt_outlined, 'color': Colors.deepOrange, 'page': const LastTransactionStatementPage()},
+
+    {'title': 'লোন', 'icon': Icons.request_page_outlined, 'color': Colors.brown, 'page': const WithdrawPage()},
+    {'title': 'ভিউ লোন', 'icon': Icons.description, 'color': Colors.brown, 'page': const ViewLoanPage()},
+    {'title': 'পে লোন', 'icon': Icons.receipt_long, 'color': Colors.brown, 'page': const WithdrawPage()},
 
     {'title': 'পেমেন্ট', 'icon': Icons.payment_outlined, 'color': Colors.purpleAccent, 'page': const WithdrawPage()},
     {'title': 'অ্যাড মানি', 'icon': Icons.add_card, 'color': Colors.blueAccent, 'page': const TransferMoneyPage()},
     {'title': 'পে বিল', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const WithdrawPage()},
     {'title': 'সেভিংস', 'icon': Icons.savings_outlined, 'color': Colors.pink, 'page': const WithdrawPage()},
-    {'title': 'লোন', 'icon': Icons.money_outlined, 'color': Colors.brown, 'page': const WithdrawPage()},
+
     // ** Extra 4 items for the 'See More' section **
     {'title': 'ইনস্যুরেন্স', 'icon': Icons.health_and_safety_outlined, 'color': Colors.cyan, 'page': const WithdrawPage()},
     {'title': 'বিকাশ টু ব্যাংক', 'icon': Icons.account_balance_outlined, 'color': Colors.green, 'page': const WithdrawPage()},

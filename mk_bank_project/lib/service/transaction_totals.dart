@@ -34,11 +34,15 @@ class PdfUtility {
     return TransactionTotals(totalWithdraw, totalDeposit, runningBalance);
   }
 
+  //==========
+
+  //==========
+
   static Future<Uint8List> generateTransactionStatement(
       List<TransactionDTO> transactions, TransactionTotals totals) async {
     final pdf = pw.Document();
 
-    if (transactions.isEmpty) return Uint8List(0);
+    //if (transactions.isEmpty) return Uint8List(0);
 
     final AccountsDTO? account = transactions.isNotEmpty ? transactions.first.account : null;
     final generatedDate = DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now().toLocal());
@@ -203,12 +207,20 @@ class PdfUtility {
           ? (tx.amount?.toStringAsFixed(2) ?? '')
           : '';
 
-      final String deposit = tx.type == 'CREDIT'
-          ? (tx.amount?.toStringAsFixed(2) ?? '')
-          : '';
+      //final String withdraw = tx.type == 'DEBIT'
+      //     ? (tx.amount ?? 0.0).toStringAsFixed(2)
+      //     : '';
+
+       final String deposit = tx.type == 'CREDIT'
+           ? (tx.amount?.toStringAsFixed(2) ?? '')
+           : '';
+
+     // final String deposit = tx.type == 'CREDIT'
+     //      ? (tx.amount ?? 0.0).toStringAsFixed(2)
+     //      : '';
 
       final String balance = tx.runningBalance?.toStringAsFixed(2) ?? '';
-
+      //final String balance = (tx.runningBalance ?? 0.0).toStringAsFixed(2);
 
       tableData.add([
         dateString,
