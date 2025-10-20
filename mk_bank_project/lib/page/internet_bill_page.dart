@@ -329,7 +329,7 @@ class _InternetBillPageState extends State<InternetBillPage> {
       value: _selectedCompany,
       decoration: InputDecoration(
         hintText: '-- Select Internet Provider --',
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
