@@ -73,6 +73,9 @@ class _StatementPageState extends State<StatementPage> {
     }
 
     _totalBalance = runningBalance;
+
+    // Last transactian fast a dekhar jonno
+    // _transactions = _transactions.reversed.toList();
   }
 
   // API থেকে ট্রানজেকশন আনার ফাংশন

@@ -6,7 +6,6 @@ import 'package:mk_bank_project/dto/transactiondto.dart';
 import 'package:mk_bank_project/dto/accountsdto.dart';
 import 'package:intl/intl.dart';
 
-// Angular এর computeTotals লজিক থেকে নেওয়া
 class TransactionTotals {
   final double totalWithdraw;
   final double totalDeposit;
@@ -15,7 +14,6 @@ class TransactionTotals {
 }
 
 class PdfUtility {
-  // Angular এর computeTotals লজিক এখানেও ব্যবহার করা হলো
   static TransactionTotals computeTotals(List<TransactionDTO> transactions) {
     double totalWithdraw = 0;
     double totalDeposit = 0;
@@ -34,88 +32,100 @@ class PdfUtility {
     return TransactionTotals(totalWithdraw, totalDeposit, runningBalance);
   }
 
-  //==========
-
-  //==========
-
   static Future<Uint8List> generateTransactionStatement(
       List<TransactionDTO> transactions, TransactionTotals totals) async {
     final pdf = pw.Document();
 
-    //if (transactions.isEmpty) return Uint8List(0);
+    final font = await PdfGoogleFonts.robotoRegular();
+    final boldFont = await PdfGoogleFonts.robotoBold();
+    final PdfColor darkBlue = PdfColor.fromInt(0xFF003366);
 
-    final AccountsDTO? account = transactions.isNotEmpty ? transactions.first.account : null;
-    final generatedDate = DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now().toLocal());
-    final PdfColor darkBlue = PdfColor.fromInt(0xFF003366); // 0, 51, 102
+    final AccountsDTO? account =
+    transactions.isNotEmpty ? transactions.first.account : null;
+    final generatedDate =
+    DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now().toLocal());
 
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // -------- Header Section ----------
-              _buildHeader(darkBlue),
-              pw.Divider(color: darkBlue, thickness: 0.6),
+        margin: const pw.EdgeInsets.all(20),
+        theme: pw.ThemeData.withFont(base: font, bold: boldFont),
 
-              // -------- Customer Info Section ----------
-              if (account != null)
-                _buildCustomerInfo(account, darkBlue, generatedDate),
-              pw.SizedBox(height: 15),
+        // ✅ Repeating header (on every page)
+        header: (context) => _buildHeader(darkBlue),
 
-              // -------- Transactions Table Title ----------
-              pw.Text('Transaction Details',
-                  style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: 14,
-                      color: darkBlue)),
-              pw.SizedBox(height: 5),
+        // ✅ Repeating footer (page numbers)
+        footer: (ctx) => pw.Container(
+          alignment: pw.Alignment.centerRight,
+          margin: const pw.EdgeInsets.only(top: 6),
+          child: pw.Text(
+            'Page ${ctx.pageNumber} of ${ctx.pagesCount}',
+            style: const pw.TextStyle(fontSize: 8),
+          ),
+        ),
 
-              // -------- Transactions Table and Totals ----------
-              _buildTransactionTable(transactions, totals, darkBlue),
+        // ✅ Main content
+        build: (context) => [
+          if (account != null)
+            _buildCustomerInfo(account, darkBlue, generatedDate),
 
-              pw.SizedBox(height: 20),
+          pw.SizedBox(height: 5),
 
-              // -------- Footer ----------
-              pw.Text(
-                "This report has been generated from MK Bank iBanking based on available data. No signature required.",
-                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey),
-              ),
-            ],
-          );
-        },
+          pw.Text(
+            'Transaction Details',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 14,
+              color: darkBlue,
+            ),
+          ),
+          pw.SizedBox(height: 3),
+
+          // ✅ Use spread operator to allow multi-page flow
+          ..._buildTransactionTable(transactions, totals, darkBlue),
+
+          pw.SizedBox(height: 12),
+          pw.Text(
+            "This report has been generated from MK Bank iBanking based on available data. No signature required.",
+            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey),
+          ),
+        ],
       ),
     );
 
     return pdf.save();
   }
 
+  // ================= HEADER =================
   static pw.Widget _buildHeader(PdfColor darkBlue) {
-    return pw.Center(
-      child: pw.Column(
-        children: [
-          pw.Text(
-            'MK Bank PLC.',
-            style: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold,
-              fontSize: 22,
-              color: darkBlue,
-            ),
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          'MK Bank PLC.',
+          style: pw.TextStyle(
+            fontWeight: pw.FontWeight.bold,
+            fontSize: 16,
+            color: darkBlue,
           ),
-          pw.Text('Head Office, Dhaka', style: const pw.TextStyle(fontSize: 12)),
-          pw.Text('Trusted Banking Partner Since 1990',
-              style: pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
-        ],
-      ),
+        ),
+        pw.Text('Head Office, Dhaka', style: const pw.TextStyle(fontSize: 10)),
+        pw.Text(
+          'Trusted Banking Partner Since 1990',
+          style: pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+        ),
+        pw.SizedBox(height: 5),
+        pw.Divider(color: darkBlue, thickness: 0.5),
+      ],
     );
   }
 
+  // ================= CUSTOMER INFO =================
   static pw.Widget _buildCustomerInfo(
       AccountsDTO account, PdfColor darkBlue, String generatedDate) {
-
     final String openingDate = account.accountOpeningDate != null
-        ? DateFormat('yyyy-MM-dd').format(DateTime.parse(account.accountOpeningDate!))
+        ? DateFormat('yyyy-MM-dd')
+        .format(DateTime.parse(account.accountOpeningDate!))
         : '---';
 
     return pw.Column(
@@ -124,13 +134,21 @@ class PdfUtility {
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
-            pw.Text('Customer Information',
-                style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold, fontSize: 14, color: darkBlue)),
+            pw.Text(
+              'Customer Information',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 14,
+                color: darkBlue,
+              ),
+            ),
             pw.Text(
               'Report generated: $generatedDate',
               style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold, fontSize: 10, color: darkBlue),
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 10,
+                color: darkBlue,
+              ),
             ),
           ],
         ),
@@ -139,7 +157,6 @@ class PdfUtility {
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            // Left Column
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -148,7 +165,6 @@ class PdfUtility {
                 _infoRow('Address:', account.address),
               ],
             ),
-            // Right Column
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -157,7 +173,7 @@ class PdfUtility {
                 _infoRow('Telephone:', account.phoneNumber),
               ],
             ),
-            pw.SizedBox(width: 50), // স্পেস বজায় রাখার জন্য
+            pw.SizedBox(width: 40),
           ],
         ),
       ],
@@ -170,18 +186,26 @@ class PdfUtility {
       child: pw.Row(
         children: [
           pw.SizedBox(
-            width: 80, // লেবেলের জন্য নির্দিষ্ট প্রস্থ
-            child: pw.Text(label,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11)),
+            width: 90,
+            child: pw.Text(
+              label,
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 10,
+              ),
+            ),
           ),
-          pw.Text(value, style: const pw.TextStyle(fontSize: 11)),
+          pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
         ],
       ),
     );
   }
 
-  static pw.Widget _buildTransactionTable(
-      List<TransactionDTO> transactions, TransactionTotals totals, PdfColor darkBlue) {
+  // ================= TABLE =================
+  static List<pw.Widget> _buildTransactionTable(
+      List<TransactionDTO> transactions,
+      TransactionTotals totals,
+      PdfColor darkBlue) {
     final headers = [
       'Date',
       'Particulars',
@@ -192,37 +216,20 @@ class PdfUtility {
       'Balance'
     ];
 
-    final List<List<String>> tableData = [];
-
-    for (var tx in transactions) {
-      final String dateString = tx.transactionTime != null
+    final data = transactions.map((tx) {
+      final dateString = tx.transactionTime != null
           ? DateFormat('dd MMM yy').format(DateTime.parse(tx.transactionTime!))
           : '---';
+      final description = (tx.description ?? '').replaceAll('\n', ' ');
+      final id = '${tx.id ?? ''}';
+      final type = tx.type ?? '';
+      final withdraw =
+      tx.type == 'DEBIT' ? (tx.amount?.toStringAsFixed(2) ?? '') : '';
+      final deposit =
+      tx.type == 'CREDIT' ? (tx.amount?.toStringAsFixed(2) ?? '') : '';
+      final balance = tx.runningBalance?.toStringAsFixed(2) ?? '';
 
-      final String description = tx.description ?? '';
-      final String id = '${tx.id ?? ''}';
-      final String type = tx.type ?? '';
-
-      final String withdraw = tx.type == 'DEBIT'
-          ? (tx.amount?.toStringAsFixed(2) ?? '')
-          : '';
-
-      //final String withdraw = tx.type == 'DEBIT'
-      //     ? (tx.amount ?? 0.0).toStringAsFixed(2)
-      //     : '';
-
-       final String deposit = tx.type == 'CREDIT'
-           ? (tx.amount?.toStringAsFixed(2) ?? '')
-           : '';
-
-     // final String deposit = tx.type == 'CREDIT'
-     //      ? (tx.amount ?? 0.0).toStringAsFixed(2)
-     //      : '';
-
-      final String balance = tx.runningBalance?.toStringAsFixed(2) ?? '';
-      //final String balance = (tx.runningBalance ?? 0.0).toStringAsFixed(2);
-
-      tableData.add([
+      return [
         dateString,
         description,
         id,
@@ -230,89 +237,75 @@ class PdfUtility {
         withdraw,
         deposit,
         balance,
-      ]);
-    }
+      ];
+    }).toList();
 
-    // টেবিল তৈরি
-    final transactionTable = pw.Table.fromTextArray(
+    // ✅ Auto page split handled by TableHelper
+    final table = pw.TableHelper.fromTextArray(
       headers: headers,
-      data: tableData,
-      border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
+      data: data,
+      border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.35),
       headerStyle: pw.TextStyle(
-          color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 9),
+        color: PdfColors.white,
+        fontWeight: pw.FontWeight.bold,
+        fontSize: 9,
+      ),
       headerDecoration: pw.BoxDecoration(color: darkBlue),
-
-      cellAlignment: pw.Alignment.centerLeft, // ডিফল্ট alignment বাম দিকে
-
-      // ✅ ফিক্স: cellAlignments ব্যবহার করা হলো যা TableCellFormat এরর বাইপাস করবে।
-      cellAlignments: {
-        4: pw.Alignment.centerRight, // Withdraw (5th column, index 4)
-        5: pw.Alignment.centerRight, // Deposit (6th column, index 5)
-        6: pw.Alignment.centerRight, // Balance (7th column, index 6)
-      },
-
       cellStyle: const pw.TextStyle(fontSize: 8),
-      cellPadding: const pw.EdgeInsets.all(3),
-
+      cellPadding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       columnWidths: {
-        0: const pw.FixedColumnWidth(1.2),
-        1: const pw.FixedColumnWidth(2.5),
-        2: const pw.FixedColumnWidth(1.2),
-        3: const pw.FixedColumnWidth(1),
-        4: const pw.FixedColumnWidth(1.5),
-        5: const pw.FixedColumnWidth(1.5),
-        6: const pw.FixedColumnWidth(1.5),
+        0: const pw.FlexColumnWidth(1),
+        1: const pw.FlexColumnWidth(4),
+        2: const pw.FlexColumnWidth(1),
+        3: const pw.FlexColumnWidth(1),
+        4: const pw.FlexColumnWidth(1),
+        5: const pw.FlexColumnWidth(1),
+        6: const pw.FlexColumnWidth(1),
       },
-
-      // cellFormat ব্লকটি পুরোপুরি মুছে ফেলা হয়েছে।
     );
 
-    // মোট দেখানোর জন্য একটি নতুন কলাম/রো তৈরি করা (আগে থেকেই ফিক্সড ছিল)
     final totalRow = pw.Container(
-      decoration: const pw.BoxDecoration(
-        color: PdfColors.grey300,
-      ),
-      padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      width: double.infinity,
+      color: PdfColors.grey300,
+      padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       child: pw.Row(
         children: [
-          pw.Expanded(
-            flex: 6,
-            child: pw.Text('TOTAL',
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10, color: PdfColors.black)),
+          pw.Expanded(flex: 6, child: pw.Container()),
+          pw.SizedBox(
+            width: 60,
+            child: pw.Text(
+              totals.totalWithdraw.toStringAsFixed(2),
+              textAlign: pw.TextAlign.right,
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9),
+            ),
           ),
-          // Withdraw Total
-          pw.Expanded(
-            flex: 2,
-            child: pw.Text(totals.totalWithdraw.toStringAsFixed(2),
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.black)),
+          pw.SizedBox(width: 8),
+          pw.SizedBox(
+            width: 60,
+            child: pw.Text(
+              totals.totalDeposit.toStringAsFixed(2),
+              textAlign: pw.TextAlign.right,
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9),
+            ),
           ),
-          // Deposit Total
-          pw.Expanded(
-            flex: 2,
-            child: pw.Text(totals.totalDeposit.toStringAsFixed(2),
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.black)),
-          ),
-          // Balance Total
-          pw.Expanded(
-            flex: 2,
-            child: pw.Text(totals.totalBalance.toStringAsFixed(2),
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.blue900)),
+          pw.SizedBox(width: 8),
+          pw.SizedBox(
+            width: 60,
+            child: pw.Text(
+              totals.totalBalance.toStringAsFixed(2),
+              textAlign: pw.TextAlign.right,
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 9,
+                color: PdfColors.blue900,
+              ),
+            ),
           ),
         ],
       ),
     );
 
-    // টেবিল এবং টোটাল একসাথে কলামে দেখানো
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-      children: [
-        transactionTable,
-        totalRow,
-      ],
-    );
+    // ✅ Return as list, not inside a Column
+    return [table, pw.SizedBox(height: 6), totalRow];
   }
 }

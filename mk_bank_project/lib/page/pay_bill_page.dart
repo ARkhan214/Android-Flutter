@@ -162,7 +162,7 @@ class _PayBillPageState extends State<PayBillPage> {
         backgroundColor: Colors.white,
         // Title
         title: Text(
-          'Mobile Recharge',
+          'Bill Payment Service',
           style: GoogleFonts.poppins(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -201,17 +201,17 @@ class _PayBillPageState extends State<PayBillPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // একটি ছোট স্পেসার বা মেনু হেডার যোগ করা যেতে পারে
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 15 * fontScale, horizontal: 16),
-              child: Text(
-                'বিল পেমেন্ট সার্ভিসেস',
-                style: TextStyle(
-                  fontSize: 18 * fontScale,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: EdgeInsets.symmetric(vertical: 15 * fontScale, horizontal: 16),
+            //   child: Text(
+            //     'বিল পেমেন্ট সার্ভিসেস',
+            //     style: TextStyle(
+            //       fontSize: 18 * fontScale,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black87,
+            //     ),
+            //   ),
+            // ),
 
             // ------------------ বিল মেনু গ্রিড ------------------
             Padding(
