@@ -19,6 +19,7 @@ import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
 import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/view_loan_page.dart';
+import 'package:mk_bank_project/page/view_policy_page.dart';
 import 'package:mk_bank_project/page/water_bill_page.dart';
 import 'package:mk_bank_project/page/withdraw_page.dart';
 import 'package:mk_bank_project/service/authservice.dart';
@@ -171,12 +172,20 @@ class _AccountsProfileState extends State<AccountsProfile> {
     },
 
     // ** Extra 4 items for the 'See More' section **
+    // {
+    //   'title': 'ইনস্যুরেন্স',
+    //   'icon': Icons.health_and_safety_outlined,
+    //   'color': Colors.cyan,
+    //   'page': const WithdrawPage(),
+    // },
+
     {
       'title': 'ইনস্যুরেন্স',
       'icon': Icons.health_and_safety_outlined,
       'color': Colors.cyan,
-      'page': const WithdrawPage(),
+      'page': const ViewPolicyPage(),
     },
+
     {
       'title': 'বিকাশ টু ব্যাংক',
       'icon': Icons.account_balance_outlined,
