@@ -11,3 +11,6 @@ cmrejaulkarim@gmail.com
 rimunna322@gmail.com 
 mdatiqulislam59@gmail.com
 mnhasan1020@gmail.com
+
+
+kono basic code change korbana just 100% responsive UI banay diba .overflow kothao na hoy ,soto boro j kono device a jeno proper show kore .Ui responsive banaba sudhu ar kisu korba na.

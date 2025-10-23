@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mk_bank_project/entity/transaction_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
-// ⚠️ আপনার আসল ফাইল পাথ অনুযায়ী পরিবর্তন করুন
 import '../../service/bill_payment_service.dart';
 
 class GasBillPage extends StatefulWidget {
@@ -14,16 +12,12 @@ class GasBillPage extends StatefulWidget {
 }
 
 class _GasBillPageState extends State<GasBillPage> {
-  // GlobalKey
   final _formKey = GlobalKey<FormState>();
-
-  // TextEditingController এবং ভ্যালু
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _billingIdController = TextEditingController();
   String? _selectedCompany;
   String _token = '';
 
-  // Gas Supplier Company তালিকা
   final List<String> _companies = [
     'Titas Gas Transmission and Distribution Company Ltd.',
     'Bakhrabad Gas Distribution Company Ltd.',
@@ -35,7 +29,7 @@ class _GasBillPageState extends State<GasBillPage> {
   ];
 
   final BillPaymentService _billPaymentService = BillPaymentService();
-  final primaryColor = const Color(0xff0d6efd); // Bootstrap Primary Blue
+  final primaryColor = const Color(0xff0d6efd);
 
   @override
   void initState() {
@@ -50,17 +44,12 @@ class _GasBillPageState extends State<GasBillPage> {
     super.dispose();
   }
 
-  // --- LOCAL STORAGE & INIT লজিক (Angular ngOnInit এর সমতুল্য) ---
-
   Future<void> _loadInitialData() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // 1. টোকেন লোড
     setState(() {
       _token = prefs.getString('authToken') ?? '';
     });
 
-    // 2. সেভ করা ফর্ম ডেটা লোড
     final savedForm = prefs.getString('gasBillForm');
     if (savedForm != null) {
       final data = jsonDecode(savedForm);
@@ -70,7 +59,6 @@ class _GasBillPageState extends State<GasBillPage> {
       setState(() {});
     }
 
-    // 3. ভ্যালু চেঞ্জ লজিক সেটআপ
     _amountController.addListener(_saveForm);
     _billingIdController.addListener(_saveForm);
   }
@@ -85,8 +73,6 @@ class _GasBillPageState extends State<GasBillPage> {
     prefs.setString('gasBillForm', jsonEncode(formData));
   }
 
-  // --- SUBMIT লজিক (Angular onSubmit এর সমতুল্য) ---
-
   void _onSubmit() async {
     if (!_formKey.currentState!.validate()) {
       _showSnackbar('Form is invalid! Please fill all required fields.', isError: true);
@@ -99,10 +85,9 @@ class _GasBillPageState extends State<GasBillPage> {
       return;
     }
 
-    // Transaction মডেল তৈরি করা হলো
     final transaction = Transaction(
       id: 0,
-      type: 'GAS', // Angular-এর type: 'GAS' এর সমতুল্য
+      type: 'GAS',
       amount: amount,
       companyName: _selectedCompany,
       accountHolderBillingId: _billingIdController.text,
@@ -111,23 +96,13 @@ class _GasBillPageState extends State<GasBillPage> {
     );
 
     try {
-      // API কল: payGas ব্যবহার করা হয়েছে
       final res = await _billPaymentService.payGas(transaction.toJson(), _token);
-
       _showSnackbar('${res.amount.toStringAsFixed(2)} Taka GAS Bill Payment successful!', isError: false);
       _resetForm();
-
-      // router.navigate(['/invoice']) এর সমতুল্য
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (context) => const InvoicePage()),
-      // );
-
     } catch (err) {
       _showSnackbar(err.toString().replaceFirst('Exception: ', ''), isError: true);
     }
   }
-
-  // --- ফর্ম রিসেট লজিক ---
 
   void _resetForm() async {
     _formKey.currentState?.reset();
@@ -141,8 +116,6 @@ class _GasBillPageState extends State<GasBillPage> {
     prefs.remove('gasBillForm');
   }
 
-  // --- ইউটিলিটি ফাংশন ---
-
   void _showSnackbar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -153,10 +126,11 @@ class _GasBillPageState extends State<GasBillPage> {
     );
   }
 
-  // --- UI/ভিউ (Angular HTML টেমপ্লেটের সমতুল্য) ---
-
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isSmallScreen = width < 500;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🌬 Gas Bill Payment'),
@@ -164,48 +138,40 @@ class _GasBillPageState extends State<GasBillPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 40, vertical: 20),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: BoxConstraints(maxWidth: 720),
             child: Card(
-              elevation: 8, // shadow-lg
+              elevation: 8,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(40.0),
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 20 : 40, vertical: isSmallScreen ? 30 : 50),
                 child: Form(
                   key: _formKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Title
                       Text(
                         '🌬 Gas Bill Payment',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: isSmallScreen ? 22 : 32,
                           fontWeight: FontWeight.bold,
                           color: primaryColor,
-                          letterSpacing: 1,
                         ),
                       ),
-                      Divider(height: 40, thickness: 1, color: primaryColor.withOpacity(0.3)),
-
-                      // Gas Supplier Company
+                      Divider(height: isSmallScreen ? 30 : 40, thickness: 1, color: primaryColor.withOpacity(0.3)),
                       _buildLabel('Gas Supplier Company', primaryColor),
-                      _buildDropdown(primaryColor),
-                      const SizedBox(height: 20),
-
-                      // Account / Consumer ID
+                      _buildDropdown(),
+                      SizedBox(height: isSmallScreen ? 15 : 20),
                       _buildLabel('Account / Consumer ID', primaryColor),
                       _buildTextField(
                         controller: _billingIdController,
                         hint: 'Enter consumer ID / billing ID',
                         validator: (value) => value == null || value.isEmpty ? 'Billing ID is required.' : null,
                       ),
-                      const SizedBox(height: 20),
-
-                      // Amount
+                      SizedBox(height: isSmallScreen ? 15 : 20),
                       _buildLabel('Amount', primaryColor),
                       _buildTextField(
                         controller: _amountController,
@@ -213,61 +179,52 @@ class _GasBillPageState extends State<GasBillPage> {
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) return 'Amount is required.';
-                          if (double.tryParse(value) == null || double.parse(value)! < 1) return 'Amount must be at least 1.';
+                          if (double.tryParse(value) == null || double.parse(value) < 1) return 'Amount must be at least 1.';
                           return null;
                         },
                       ),
-                      const SizedBox(height: 40),
-
-                      // Buttons
+                      SizedBox(height: isSmallScreen ? 30 : 40),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Pay Bill Button (Submit)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 10),
+                              padding: const EdgeInsets.only(right: 8),
                               child: ElevatedButton(
                                 onPressed: _token.isNotEmpty ? _onSubmit : null,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor, // Primary Blue
+                                  backgroundColor: primaryColor,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                                  padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 15),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                  elevation: 4,
                                 ),
-                                child: const Text('💳 Pay Bill', style: TextStyle(fontSize: 18)),
+                                child: Text('💳 Pay Bill', style: TextStyle(fontSize: isSmallScreen ? 16 : 18)),
                               ),
                             ),
                           ),
-
-                          // Reset Button
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
+                              padding: const EdgeInsets.only(left: 8),
                               child: OutlinedButton(
                                 onPressed: _resetForm,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                                  padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 15),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                                   side: const BorderSide(color: Colors.black54),
                                 ),
-                                child: const Text('Reset', style: TextStyle(fontSize: 18, color: Colors.black54)),
+                                child: Text('Reset', style: TextStyle(fontSize: isSmallScreen ? 16 : 18, color: Colors.black54)),
                               ),
                             ),
                           ),
                         ],
                       ),
-
-                      // Not logged in note
                       if (_token.isEmpty)
                         Container(
                           margin: const EdgeInsets.only(top: 20),
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                              color: Colors.yellow.shade100, // Angular alert-warning এর কাছাকাছি
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(color: Colors.yellow.shade400)
+                            color: Colors.yellow.shade100,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.yellow.shade400),
                           ),
                           child: const Text(
                             '⚠️ You are not logged in. Please login to make a payment.',
@@ -286,7 +243,6 @@ class _GasBillPageState extends State<GasBillPage> {
     );
   }
 
-  // Label Helper Widget
   Widget _buildLabel(String text, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -301,7 +257,6 @@ class _GasBillPageState extends State<GasBillPage> {
     );
   }
 
-  // TextField Helper Widget
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
@@ -317,12 +272,11 @@ class _GasBillPageState extends State<GasBillPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
       ),
       validator: validator,
-      onChanged: (value) { _saveForm(); },
+      onChanged: (value) => _saveForm(),
     );
   }
 
-  // Dropdown Helper Widget
-  Widget _buildDropdown(Color primaryColor) {
+  Widget _buildDropdown() {
     return DropdownButtonFormField<String>(
       value: _selectedCompany,
       decoration: InputDecoration(
@@ -337,7 +291,7 @@ class _GasBillPageState extends State<GasBillPage> {
       items: _companies.map((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(value, overflow: TextOverflow.ellipsis),
         );
       }).toList(),
       onChanged: (String? newValue) {

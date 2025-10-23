@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mk_bank_project/account/profile_page.dart';
 import 'package:mk_bank_project/page/credit_card_bill_page.dart';
+import 'package:mk_bank_project/page/dps_page.dart';
 import 'package:mk_bank_project/page/electricity_bill_page.dart';
 import 'package:mk_bank_project/page/fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/gas_bill_page.dart';
@@ -14,9 +15,11 @@ import 'package:mk_bank_project/page/loan_apply_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/mobile_recharge_page.dart';
 import 'package:mk_bank_project/page/pay_bill_page.dart';
+import 'package:mk_bank_project/page/pay_dps_page.dart';
 import 'package:mk_bank_project/page/pay_loan_page.dart';
 import 'package:mk_bank_project/page/statement_page.dart';
 import 'package:mk_bank_project/page/transfer_money_page.dart';
+import 'package:mk_bank_project/page/view_all_dps_page.dart';
 import 'package:mk_bank_project/page/view_fixed_deposit_page.dart';
 import 'package:mk_bank_project/page/view_loan_page.dart';
 import 'package:mk_bank_project/page/view_policy_page.dart';
@@ -114,9 +117,23 @@ class _AccountsProfileState extends State<AccountsProfile> {
     // Fixed Deposit
     {
       'title': 'ডিপিএস',
-      'icon': Icons.auto_delete_outlined,
+      'icon': Icons.savings_outlined,
+      'color': Colors.pink,
+      'page': const DPSPage(),
+    },
+
+    {
+      'title': 'ভিউ ডিপিএস',
+      'icon': Icons.visibility,
       'color': Colors.indigo,
-      'page': const WithdrawPage(),
+      'page': const ViewAllDPSPage(),
+    },
+
+    {
+      'title': 'পে ডিপিএস',
+      'icon': Icons.payment,
+      'color': Colors.indigo,
+      'page': const PayDpsPage(),
     },
 
     // DPS (আপাতত WithdrawPage ব্যবহার করা হলো)
@@ -139,18 +156,18 @@ class _AccountsProfileState extends State<AccountsProfile> {
       'page': const PayLoanPage(),
     },
 
-    {
-      'title': 'পেমেন্ট',
-      'icon': Icons.payment_outlined,
-      'color': Colors.purpleAccent,
-      'page': const WithdrawPage(),
-    },
-    {
-      'title': 'অ্যাড মানি',
-      'icon': Icons.add_card,
-      'color': Colors.blueAccent,
-      'page': const TransferMoneyPage(),
-    },
+    // {
+    //   'title': 'পেমেন্ট',
+    //   'icon': Icons.payment_outlined,
+    //   'color': Colors.purpleAccent,
+    //   'page': const WithdrawPage(),
+    // },
+    // {
+    //   'title': 'অ্যাড মানি',
+    //   'icon': Icons.add_card,
+    //   'color': Colors.blueAccent,
+    //   'page': const TransferMoneyPage(),
+    // },
     {
       'title': 'পে বিল',
       'icon': Icons.lightbulb_outline,
@@ -164,12 +181,12 @@ class _AccountsProfileState extends State<AccountsProfile> {
     // {'title': 'Gas Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const GasBillPage()},
     // {'title': 'Internet Bill', 'icon': Icons.lightbulb_outline, 'color': Colors.indigo, 'page': const InternetBillPage()},
     //
-    {
-      'title': 'সেভিংস',
-      'icon': Icons.savings_outlined,
-      'color': Colors.pink,
-      'page': const WithdrawPage(),
-    },
+    // {
+    //   'title': 'সেভিংস',
+    //   'icon': Icons.savings_outlined,
+    //   'color': Colors.pink,
+    //   'page': const WithdrawPage(),
+    // },
 
     // ** Extra 4 items for the 'See More' section **
     // {
@@ -186,24 +203,24 @@ class _AccountsProfileState extends State<AccountsProfile> {
       'page': const ViewPolicyPage(),
     },
 
-    {
-      'title': 'বিকাশ টু ব্যাংক',
-      'icon': Icons.account_balance_outlined,
-      'color': Colors.green,
-      'page': const WithdrawPage(),
-    },
-    {
-      'title': 'এডুকেশন ফি',
-      'icon': Icons.book_outlined,
-      'color': Colors.orange,
-      'page': const WithdrawPage(),
-    },
-    {
-      'title': 'মাইক্রোফাইন্যান্স',
-      'icon': Icons.paid_outlined,
-      'color': Colors.deepPurple,
-      'page': const WithdrawPage(),
-    },
+    // {
+    //   'title': 'বিকাশ টু ব্যাংক',
+    //   'icon': Icons.account_balance_outlined,
+    //   'color': Colors.green,
+    //   'page': const WithdrawPage(),
+    // },
+    // {
+    //   'title': 'এডুকেশন ফি',
+    //   'icon': Icons.book_outlined,
+    //   'color': Colors.orange,
+    //   'page': const WithdrawPage(),
+    // },
+    // {
+    //   'title': 'মাইক্রোফাইন্যান্স',
+    //   'icon': Icons.paid_outlined,
+    //   'color': Colors.deepPurple,
+    //   'page': const WithdrawPage(),
+    // },
 
     // You can add more items if needed for the third row, but we'll stick to 12 for 3 rows of 4
   ];
