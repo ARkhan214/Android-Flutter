@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mk_bank_project/page/admin_loan_approve_page.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
+import 'package:mk_bank_project/page/view_all_loan_admin_page.dart';
 import 'package:mk_bank_project/page/view_policy_page.dart';
 // import 'package:mk_bank_project/page/viewpolicy_page.dart'; // ← 🔹 এই ইমপোর্ট যুক্ত করো
 import 'package:mk_bank_project/service/authservice.dart';
@@ -138,6 +140,28 @@ class AdminPage extends StatelessWidget {
                 leading: const Icon(Icons.dashboard),
                 title: const Text('Dashboard Overview'),
                 onTap: () => Navigator.pop(context)),
+            ListTile(
+              leading: const Icon(Icons.create),
+              title: const Text('View all loans'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ViewAllLoansPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.create),
+              title: const Text('View Pending Loan'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminLoanApprovePage()),
+                );
+              },
+            ),
             ListTile(
                 leading: const Icon(Icons.people),
                 title: const Text('Manage Employees'),

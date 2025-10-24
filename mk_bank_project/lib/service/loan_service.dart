@@ -12,6 +12,9 @@ class LoanService {
   final String _apiUrl = '${Environment.springUrl}/api/loans/myloans';
   // আপনার API URL (loadUserLoans, fetchLoanDetails, payLoan-এর জন্য ব্যবহৃত)
   final String _baseUrl = 'http://localhost:8085/api/loans';
+
+  final String _adminBaseUrl = '${Environment.springUrl}/api/admin/loans';
+
   final AuthService _authService = AuthService();
 
   Future<List<LoanDTO>> getMyLoans() async {
@@ -123,6 +126,53 @@ class LoanService {
     } else {
       final errorBody = jsonDecode(response.body);
       throw Exception(errorBody['message'] ?? 'Payment failed');
+    }
+  }
+
+
+  //====================================================================
+  // *** Admin Specific API Calls ***
+  // Angular-এর 'getAll()' মেথডটির সমতুল্য
+  //====================================================================
+
+  Future<List<LoanDTO>> getAllLoans() async {
+    final headers = await _getHeaders();
+
+    // অ্যাডমিন এন্ডপয়েন্ট ব্যবহার করা হচ্ছে
+    final url = Uri.parse('$_adminBaseUrl/all');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => LoanDTO.fromJson(json)).toList();
+    } else {
+      // ত্রুটি বার্তা যাতে ইউজার দেখতে পায়
+      throw Exception('Failed to load all loans for admin: ${response.statusCode}');
+    }
+  }
+
+  //===============Admin Aproval part===========
+
+  Future<List<LoanDTO>> getPendingLoans() async {
+    final allLoans = await getAllLoans();
+    return allLoans.where((loan) => loan.status.toUpperCase() == 'PENDING').toList();
+  }
+
+  Future<void> approveLoan(int loanId) async {
+    final headers = await _getHeaders();
+    final url = Uri.parse('$_adminBaseUrl/$loanId/approve');
+    final response = await http.post(url, headers: headers);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to approve loan: ${response.statusCode}');
+    }
+  }
+
+  Future<void> rejectLoan(int loanId) async {
+    final headers = await _getHeaders();
+    final url = Uri.parse('$_adminBaseUrl/$loanId/reject');
+    final response = await http.post(url, headers: headers);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to reject loan: ${response.statusCode}');
     }
   }
 

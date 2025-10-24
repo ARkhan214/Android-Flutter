@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mk_bank_project/page/loginpage.dart';
 import 'package:mk_bank_project/page/registrationpage.dart';
+// import 'package:mk_bank_project/page/transaction_statement_page_for_employee.dart';
 import 'package:mk_bank_project/service/authservice.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -306,6 +307,17 @@ class EmployeePage extends StatelessWidget {
                 );
               },
             ),
+            // ListTile(
+            //   leading: const Icon(Icons.create),
+            //   title: const Text('Transaction Statement'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => const TransactionStatementPageForEmployee()),
+            //     );
+            //   },
+            // ),
 
             ListTile(
               leading: const Icon(Icons.settings),

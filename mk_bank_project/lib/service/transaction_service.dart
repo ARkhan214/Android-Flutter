@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:mk_bank_project/api/environment.dart';
+import 'package:mk_bank_project/dto/transactiondto.dart';
 import 'package:mk_bank_project/entity/transaction_model.dart';
 import 'authservice.dart';
 
@@ -73,4 +75,12 @@ class TransactionService {
       throw Exception('Failed to fetch transactions: ${response.body}');
     }
   }
+
+
+
+  //==========For Employee======Transaction Statement==========
+
+
+
+
 }
